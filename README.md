@@ -38,7 +38,7 @@ Vanilla JS, Vite, IndexedDB. No framework, no server, no accounts. Hosted on Ver
 
 ## Roadmap
 
-The public roadmap lives at [footnote-tan.vercel.app/public/roadmap.html](https://footnote-tan.vercel.app/public/roadmap.html). Phase 0 (flat-doc + voice) is live. Phase 0.5 adds timestamp margins, data export, and Tally submissions.
+The public roadmap lives at [github.com/users/lee-fuhr/projects/4](https://github.com/users/lee-fuhr/projects/4). Phase 0 (flat-doc + voice) is shipped. Phase 0.5 is next.
 
 ## Contributing
 
