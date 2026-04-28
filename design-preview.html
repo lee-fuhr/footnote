@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foot.Note — design directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #0E0E0E;
+  color: #fff;
+  padding: 48px 24px 96px;
+}
+
+.page-title {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #555;
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.section-head {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #444;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* ─── Phone shell ─── */
+.phones { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin-bottom: 80px; }
+
+.phone-col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+.phone-name {
+  font-size: 12px;
+  color: #555;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.phone {
+  width: 300px;
+  height: 600px;
+  border-radius: 40px;
+  border: 9px solid #222;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px #2a2a2a, inset 0 0 0 1px #333, 0 40px 80px rgba(0,0,0,.7);
+  background: #F7F3EC;
+  display: flex;
+  flex-direction: column;
+  cursor: text;
+}
+
+/* notch */
+.phone::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 110px; height: 28px;
+  background: #222;
+  border-radius: 0 0 18px 18px;
+  z-index: 10;
+}
+
+/* ─── Shared field journal palette ─── */
+:root {
+  --cream:   #F7F3EC;
+  --ink:     #1C1814;
+  --tan:     #8B6F47;
+  --tan-lt:  #C4B49A;
+  --tan-faint: rgba(139,111,71,.12);
+  --rule:    #D4C4A8;
+}
+
+.status-bar {
+  margin-top: 36px;
+  padding: 0 20px 6px;
+  display: flex;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--tan);
+}
+
+.writing-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 22px 12px;
+  scrollbar-width: none;
+}
+.writing-area::-webkit-scrollbar { display: none; }
+
+.gps-footer {
+  padding: 9px 22px;
+  border-top: 1px solid var(--rule);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--tan);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--cream);
+}
+
+.gps-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--tan);
+  flex-shrink: 0;
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,100% { opacity: 1; }
+  50% { opacity: .35; }
+}
+
+/* body text style */
+.note-body {
+  font-family: 'EB Garamond', serif;
+  font-size: 18px;
+  line-height: 1.68;
+  color: var(--ink);
+}
+
+/* ─── APPROACH A: Editorial separator ─── */
+/* A thin ruled line with timestamp + GPS in mono, centred */
+.sep-a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0;
+  color: var(--tan-lt);
+}
+.sep-a::before, .sep-a::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+.sep-a-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9.5px;
+  color: var(--tan-lt);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── APPROACH B: Left-margin timestamps ─── */
+/* Text is indented; times hang in the left gutter */
+.margin-block {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.margin-stamp {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--tan-lt);
+  min-width: 36px;
+  padding-top: 4px;
+  line-height: 1.3;
+  text-align: right;
+  flex-shrink: 0;
+}
+.margin-text {
+  font-family: 'EB Garamond', serif;
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+/* ─── APPROACH C: Inline GPS footnote pills ─── */
+.gps-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--tan);
+  background: var(--tan-faint);
+  border: 1px solid rgba(139,111,71,.2);
+  border-radius: 10px;
+  padding: 1px 6px 1px 4px;
+  vertical-align: middle;
+  margin: 0 2px;
+  white-space: nowrap;
+}
+.gps-pill-dot {
+  width: 4px; height: 4px;
+  background: var(--tan);
+  border-radius: 50%;
+}
+
+/* ─── Logo section ─── */
+.logos {
+  display: flex;
+  gap: 48px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.logo-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 180px;
+}
+
+.app-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 20px 48px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.04);
+  transition: transform .15s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.app-icon:hover { transform: translateY(-4px) scale(1.04); }
+
+.icon-emoji { font-size: 64px; line-height: 1; }
+
+.logo-label {
+  font-size: 12px;
+  color: #555;
+  text-align: center;
+  line-height: 1.5;
+}
+.logo-label strong {
+  display: block;
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 4px;
+}
+
+hr.div { border: none; border-top: 1px solid #1e1e1e; margin: 64px auto; width: 80px; }
+</style>
+</head>
+<body>
+
+<p class="page-title">Foot.Note — field journal direction</p>
+
+<!-- ─── METADATA ON CANVAS ─── -->
+<p class="section-head">How metadata lives on the canvas</p>
+
+<div class="phones">
+
+  <!-- APPROACH A: Editorial separator lines -->
+  <div class="phone-col">
+    <div class="phone">
+      <div class="status-bar">
+        <span>9:41</span>
+        <span>Griffith Park</span>
+      </div>
+      <div class="writing-area">
+
+        <p class="note-body">The light through the oaks was impossible — that late-afternoon gold that makes you want to stop and just stand in it.</p>
+
+        <div class="sep-a">
+          <span class="sep-a-text">5:31 · 34.052°N</span>
+        </div>
+
+        <p class="note-body">Started at the lower trail entrance, where the path bends right past the dry creek bed. Still no water this year.</p>
+
+        <div class="sep-a">
+          <span class="sep-a-text">5:38 · GPS stale</span>
+        </div>
+
+        <p class="note-body">A red-tailed hawk circling south, maybe 200m out. Third time this week. There's a nest somewhere in those eucalyptus.</p>
+
+        <div class="sep-a">
+          <span class="sep-a-text">5:44 · 34.053°N</span>
+        </div>
+
+        <p class="note-body" style="color: var(--tan-lt); font-style: italic;">continuing…</p>
+
+      </div>
+      <div class="gps-footer">
+        <div class="gps-dot"></div>
+        <span>34.053°N, -118.242°W · live</span>
+      </div>
+    </div>
+    <div class="phone-name">A — Editorial separators<br><span style="font-size:10px;color:#3a3a3a">Ruled line + mono time + coords<br>between thought-blocks</span></div>
+  </div>
+
+  <!-- APPROACH B: Left-margin timestamps -->
+  <div class="phone-col">
+    <div class="phone">
+      <div class="status-bar">
+        <span>9:41</span>
+        <span>Griffith Park</span>
+      </div>
+      <div class="writing-area" style="padding-left: 10px;">
+
+        <div class="margin-block">
+          <div class="margin-stamp">5:31<br>34.05°</div>
+          <div class="margin-text">The light through the oaks was impossible — that late-afternoon gold that makes you want to stop and just stand in it.</div>
+        </div>
+
+        <div class="margin-block">
+          <div class="margin-stamp">5:38<br>stale</div>
+          <div class="margin-text">Started at the lower trail entrance, where the path bends right past the dry creek bed. Still no water this year.</div>
+        </div>
+
+        <div class="margin-block">
+          <div class="margin-stamp">5:44<br>34.05°</div>
+          <div class="margin-text">A red-tailed hawk circling south, maybe 200m out. Third time this week.</div>
+        </div>
+
+        <div class="margin-block">
+          <div class="margin-stamp" style="color:var(--rule)">now</div>
+          <div class="margin-text" style="color: var(--tan-lt); font-style: italic;">continuing…</div>
+        </div>
+
+      </div>
+      <div class="gps-footer">
+        <div class="gps-dot"></div>
+        <span>34.053°N, -118.242°W · live</span>
+      </div>
+    </div>
+    <div class="phone-name">B — Left-margin timestamps<br><span style="font-size:10px;color:#3a3a3a">Time + GPS float left,<br>prose indented right</span></div>
+  </div>
+
+  <!-- APPROACH C: Inline GPS pills embedded in prose -->
+  <div class="phone-col">
+    <div class="phone">
+      <div class="status-bar">
+        <span>9:41</span>
+        <span>Griffith Park</span>
+      </div>
+      <div class="writing-area">
+
+        <p class="note-body" style="margin-bottom:12px">
+          <span class="gps-pill"><span class="gps-pill-dot"></span>5:31 · 34.052°N</span> The light through the oaks was impossible — that late-afternoon gold that makes you want to stop.
+        </p>
+
+        <p class="note-body" style="margin-bottom:12px">
+          <span class="gps-pill"><span class="gps-pill-dot"></span>5:38 · stale</span> Started at the lower trail entrance, where the path bends right past the dry creek bed.
+        </p>
+
+        <p class="note-body" style="margin-bottom:12px">
+          <span class="gps-pill"><span class="gps-pill-dot"></span>5:44 · 34.053°N</span> A red-tailed hawk circling south, maybe 200m out. Third time this week.
+        </p>
+
+        <p class="note-body" style="color: var(--tan-lt); font-style: italic;">continuing…</p>
+
+      </div>
+      <div class="gps-footer">
+        <div class="gps-dot"></div>
+        <span>34.053°N, -118.242°W · live</span>
+      </div>
+    </div>
+    <div class="phone-name">C — Inline GPS pills<br><span style="font-size:10px;color:#3a3a3a">Compact data chip at the start<br>of each thought-block</span></div>
+  </div>
+
+</div>
+
+<hr class="div">
+
+<!-- ─── LOGOS ─── -->
+<p class="section-head">Logo marks</p>
+
+<div class="logos">
+
+  <!-- Emoji on cream -->
+  <div class="logo-col">
+    <div class="app-icon" style="background: #F7F3EC;">
+      <span class="icon-emoji">🦶</span>
+    </div>
+    <div class="logo-label">
+      <strong>Emoji on cream</strong>
+      Cheeky, zero-effort,<br>impossible to misread.<br>Works great small.
+    </div>
+  </div>
+
+  <!-- Emoji on warm dark -->
+  <div class="logo-col">
+    <div class="app-icon" style="background: #2D1E0F;">
+      <span class="icon-emoji">🦶</span>
+    </div>
+    <div class="logo-label">
+      <strong>Emoji on espresso</strong>
+      More premium feel,<br>pops on home screen<br>next to light icons.
+    </div>
+  </div>
+
+  <!-- Footprint SVG on cream -->
+  <div class="logo-col">
+    <div class="app-icon" style="background: #F7F3EC;">
+      <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- heel -->
+        <ellipse cx="36" cy="58" rx="12" ry="8" fill="#8B6F47"/>
+        <!-- mid / arch (right side narrower) -->
+        <path d="M24 58 Q21 46 25 36 L31 36 Q28 46 28 58Z" fill="#8B6F47"/>
+        <!-- ball of foot -->
+        <ellipse cx="34" cy="34" rx="10" ry="7" fill="#8B6F47"/>
+        <!-- toes, left to right -->
+        <ellipse cx="26" cy="26" rx="4" ry="5" fill="#8B6F47"/>
+        <ellipse cx="33" cy="23" rx="4" ry="5.5" fill="#8B6F47"/>
+        <ellipse cx="40" cy="24.5" rx="3.5" ry="4.5" fill="#8B6F47"/>
+        <ellipse cx="46" cy="28" rx="3" ry="4" fill="#8B6F47"/>
+        <ellipse cx="50" cy="33" rx="2.5" ry="3.5" fill="#8B6F47"/>
+      </svg>
+    </div>
+    <div class="logo-label">
+      <strong>Bare footprint SVG</strong>
+      Custom vector, anatomical.<br>Reads at 20px and 512px.<br>Bold, unmistakable.
+    </div>
+  </div>
+
+  <!-- Lettermark: F + GPS dot -->
+  <div class="logo-col">
+    <div class="app-icon" style="background: #1C1814; flex-direction: column; gap: 0;">
+      <div style="
+        font-family: 'EB Garamond', serif;
+        font-size: 72px;
+        line-height: .85;
+        color: #F7F3EC;
+        font-weight: 400;
+        letter-spacing: -.02em;
+        display: flex;
+        align-items: flex-end;
+        gap: 1px;
+      ">
+        <span>F</span>
+        <!-- period replaced by GPS pin -->
+        <span style="display:flex;flex-direction:column;align-items:center;margin-bottom:6px;gap:0;">
+          <span style="
+            width:12px;height:12px;
+            background:#8B6F47;
+            border-radius:50%;
+            display:block;
+          "></span>
+          <span style="
+            width:0;height:0;
+            border-left:5px solid transparent;
+            border-right:5px solid transparent;
+            border-top:7px solid #8B6F47;
+            display:block;
+            margin-top:-1px;
+          "></span>
+        </span>
+      </div>
+    </div>
+    <div class="logo-label">
+      <strong>Lettermark + GPS pin</strong>
+      Period = location pin.<br>Sophisticated, concept-first.<br>Works dark or light.
+    </div>
+  </div>
+
+</div>
+
+<p style="text-align:center;font-size:11px;color:#2a2a2a;margin-top:32px">Tap any phone to see the writing surface · All type is live EB Garamond</p>
+
+</body>
+</html>

@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Footnote — a walking journal</title>
+  <meta name="description" content="Footnote captures your thoughts while you walk. Every note records the time and place it came to you. No account. No cloud. Yours alone.">
+  <meta property="og:title" content="Footnote — a walking journal">
+  <meta property="og:description" content="Capture thoughts while you walk. Every note records the time and place it came to you.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #F7F3EC;
+      --ink:         #1C1814;
+      --tan-accent:  #8B6F47;
+      --gps-dot:      #9E8A70;
+      --rule:        #D4C4A8;
+      --tan-fill:   rgba(139,111,71,.10);
+      --tan-faint2:  rgba(139,111,71,.06);
+      --coral:       #8B6F47;
+      --navy:        #1C1814;
+      --font-body:   'EB Garamond', Georgia, serif;
+      --font-mono:   'IBM Plex Mono', Menlo, monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+    html, body { background: var(--bg); color: var(--ink); font-family: var(--font-body); }
+    body { -webkit-font-smoothing: antialiased; }
+
+    a { color: inherit; }
+    img, svg { display: block; }
+
+    /* ─── Layout helpers ─────────────────────────────── */
+    .container {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .container--narrow {
+      max-width: 560px;
+    }
+
+    /* ─── Rule ───────────────────────────────────────── */
+    .rule {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 0;
+    }
+
+    /* ─── Nav ────────────────────────────────────────── */
+    nav {
+      padding: 20px 0;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wordmark {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-family: var(--font-body);
+      font-size: 1.1rem;
+      color: var(--ink);
+      letter-spacing: -.01em;
+      text-decoration: none;
+    }
+
+    .wordmark em {
+      font-style: italic;
+      color: var(--tan-accent);
+    }
+
+    .nav-cta {
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      color: var(--tan-accent);
+      text-decoration: none;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 7px 14px;
+      transition: background .15s, border-color .15s;
+    }
+
+    .nav-cta:hover {
+      background: var(--tan-fill);
+      border-color: var(--tan-accent);
+    }
+
+    /* ─── Hero ───────────────────────────────────────── */
+    .hero {
+      padding: 72px 0 80px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      color: var(--gps-dot);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 3.6rem);
+      font-weight: 400;
+      line-height: 1.12;
+      color: var(--ink);
+      margin-bottom: 20px;
+      letter-spacing: -.02em;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--tan-accent);
+    }
+
+    .hero-sub {
+      font-size: clamp(1.05rem, 2.5vw, 1.2rem);
+      color: var(--gps-dot);
+      line-height: 1.6;
+      max-width: 440px;
+      margin: 0 auto 40px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--bg);
+      background: var(--ink);
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      padding: 12px 28px;
+      text-decoration: none;
+      letter-spacing: -.01em;
+      transition: background .15s, color .15s;
+    }
+
+    .btn-primary:hover {
+      background: var(--tan-accent);
+      border-color: var(--tan-accent);
+    }
+
+    .hero-hint {
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      color: var(--gps-dot);
+      line-height: 1.5;
+    }
+
+    .hero-hint strong {
+      color: var(--tan-accent);
+      font-weight: 400;
+    }
+
+    /* ─── Insight ────────────────────────────────────── */
+    .insight {
+      padding: 80px 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .insight .container {
+      max-width: 560px;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      color: var(--gps-dot);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .insight-body {
+      font-size: clamp(1.2rem, 3vw, 1.45rem);
+      line-height: 1.65;
+      color: var(--ink);
+    }
+
+    .insight-body p + p {
+      margin-top: 1.4em;
+    }
+
+    .insight-body em {
+      font-style: italic;
+      color: var(--tan-accent);
+    }
+
+    /* ─── How it works ───────────────────────────────── */
+    .how {
+      padding: 80px 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      margin-top: 40px;
+    }
+
+    @media (min-width: 600px) {
+      .how-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+    }
+
+    .how-step {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      color: var(--tan-accent);
+      letter-spacing: .1em;
+    }
+
+    .step-title {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+
+    .step-body {
+      font-size: .95rem;
+      color: var(--gps-dot);
+      line-height: 1.6;
+    }
+
+    .step-divider {
+      width: 24px;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    /* ─── Privacy ────────────────────────────────────── */
+    .privacy {
+      padding: 72px 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .privacy .container {
+      max-width: 560px;
+    }
+
+    .privacy-statement {
+      font-size: clamp(1.1rem, 2.8vw, 1.3rem);
+      line-height: 1.6;
+      color: var(--ink);
+    }
+
+    .privacy-statement strong {
+      font-weight: 500;
+    }
+
+    .privacy-footnote {
+      margin-top: 20px;
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      color: var(--gps-dot);
+      line-height: 1.55;
+    }
+
+    /* ─── Pricing ────────────────────────────────────── */
+    .pricing {
+      padding: 80px 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    @media (min-width: 640px) {
+      .pricing-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+    }
+
+    .tier-card {
+      background: var(--tan-faint2);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 24px 22px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .tier-card--pro {
+      background: var(--tan-fill);
+      border-color: rgba(139,111,71,.30);
+    }
+
+    .tier-badge {
+      font-family: var(--font-mono);
+      font-size: .64rem;
+      color: var(--gps-dot);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .tier-badge--pro {
+      color: var(--tan-accent);
+    }
+
+    .tier-name {
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .tier-price {
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      color: var(--tan-accent);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .tier-price s {
+      color: var(--gps-dot);
+      font-size: .7rem;
+      text-decoration: line-through;
+    }
+
+    .tier-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--rule);
+      margin-bottom: 20px;
+    }
+
+    .tier-includes {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      color: var(--gps-dot);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .tier-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .tier-items li {
+      font-size: .92rem;
+      color: var(--ink);
+      line-height: 1.4;
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .tier-items li::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: var(--gps-dot);
+    }
+
+    .tier-cta {
+      margin-top: 24px;
+      display: block;
+      font-family: var(--font-body);
+      font-size: .95rem;
+      font-style: italic;
+      text-align: center;
+      color: var(--tan-accent);
+      text-decoration: none;
+      border: 1px solid var(--rule);
+      border-radius: 7px;
+      padding: 9px 16px;
+      transition: background .15s, border-color .15s;
+    }
+
+    .tier-cta:hover {
+      background: var(--tan-fill);
+      border-color: var(--tan-accent);
+    }
+
+    .tier-cta--primary {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+      font-style: italic;
+    }
+
+    .tier-cta--primary:hover {
+      background: var(--tan-accent);
+      border-color: var(--tan-accent);
+    }
+
+    .tier-cta--muted {
+      color: var(--gps-dot);
+    }
+
+    /* ─── Footer ─────────────────────────────────────── */
+    .footer {
+      padding: 32px 0 48px;
+      border-top: 1px solid var(--rule);
+    }
+
+    .footer .container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    @media (min-width: 560px) {
+      .footer .container {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .footer-wordmark {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-body);
+      font-size: .95rem;
+      color: var(--ink);
+      letter-spacing: -.01em;
+      text-decoration: none;
+    }
+
+    .footer-wordmark em {
+      font-style: italic;
+      color: var(--tan-accent);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-family: var(--font-mono);
+      font-size: .68rem;
+      color: var(--gps-dot);
+      text-decoration: none;
+      transition: color .15s;
+    }
+
+    .footer-links a:hover {
+      color: var(--tan-accent);
+    }
+
+    /* ─── Install hint modal ─────────────────────────── */
+    #install-hint {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      line-height: 1.55;
+      padding: 16px 20px;
+      border-radius: 10px;
+      max-width: calc(100vw - 48px);
+      width: 360px;
+      box-shadow: 0 4px 24px rgba(28,24,20,.28);
+      z-index: 100;
+    }
+
+    #install-hint.visible { display: block; }
+
+    #install-hint p + p { margin-top: 6px; }
+
+    #install-hint .close-hint {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: var(--gps-dot);
+      font-size: .9rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 4px;
+    }
+
+    #install-hint .close-hint:hover { color: var(--bg); }
+
+    #install-hint strong { color: var(--coral); font-weight: 400; }
+
+    /* ─── Science ────────────────────────────────────── */
+    .science {
+      padding: 72px 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .science .container {
+      max-width: 560px;
+    }
+
+    .science-body {
+      font-size: clamp(1.05rem, 2.5vw, 1.2rem);
+      line-height: 1.65;
+      color: var(--ink);
+    }
+
+    .science-body p + p {
+      margin-top: 1.2em;
+    }
+
+    .science-citations {
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .citation-link {
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      color: var(--gps-dot);
+      text-decoration: none;
+      transition: color .15s;
+    }
+
+    .citation-link:hover { color: var(--tan-accent); }
+
+    /* ─── Utilities ──────────────────────────────────── */
+    .visually-hidden {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ─── Nav ──────────────────────────────────────── -->
+  <nav>
+    <div class="container">
+      <a class="wordmark" href="/about.html" aria-label="Footnote — home">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path fill="#8B6F47" d="M11.9099 13.3852C13.468 12.9364 13.7277 11.2694 12.3644 9.85887L9.89729 7.10274C9.79687 5.61865 9.42688 2.90237 8.60722 2.71002C7.78756 2.51768 6.442 3.79732 5.9049 3.35117C5.3678 2.90503 5.71014 1.90858 5.71014 1.52389C5.71014 1.1392 4.47668 0.498047 4.47668 0.498047C3.08919 1.22169 1.53298 3.61452 0.863386 5.16927C0.615782 5.74419 0.79742 6.38044 1.2215 6.84087C3.15256 8.93748 5.09835 11 7.21708 12.9235C7.59579 13.2673 8.09311 13.4518 8.60722 13.4687L8.67724 13.471C9.83907 13.5093 10.6712 13.5367 11.9099 13.3852Z"/>
+          <path fill="#1C1814" fill-rule="evenodd" d="M4.47682 0.498047L4.70743 0.0544018C4.56266 -0.0208504 4.39027 -0.0207316 4.24561 0.0547201C3.4461 0.471702 2.65435 1.32909 1.99747 2.22672C1.33051 3.1381 0.754872 4.15751 0.404306 4.9715C0.0604182 5.76998 0.330432 6.61131 0.853862 7.17961C2.78633 9.27774 4.74481 11.3542 6.88114 13.2937C7.35592 13.7247 7.96992 13.948 8.59092 13.9684L8.66879 13.971C9.82808 14.0092 10.6933 14.0378 11.9708 13.8815C11.997 13.8783 12.023 13.873 12.0485 13.8657C12.9939 13.5933 13.6087 12.9192 13.7281 12.0508C13.8437 11.2103 13.4813 10.2981 12.7308 9.51845L10.3838 6.89644C10.3269 6.15415 10.209 5.1649 10.009 4.30828C9.90165 3.84852 9.76492 3.40159 9.58836 3.04631C9.4284 2.72444 9.16267 2.32675 8.72159 2.22325C8.37655 2.14228 8.02818 2.22404 7.75219 2.319C7.49712 2.40676 7.2344 2.5319 7.00817 2.63966L6.93589 2.67405C6.67467 2.798 6.47486 2.88727 6.31606 2.92741C6.25813 2.94206 6.22273 2.94586 6.20345 2.9464C6.13939 2.87629 6.09026 2.73346 6.10557 2.44059C6.11333 2.2922 6.13551 2.14052 6.1594 1.98478L6.16479 1.94992C6.1849 1.82 6.21029 1.65605 6.21029 1.52389C6.21029 1.34611 6.14129 1.20106 6.08212 1.10571C6.02025 1.00601 5.94269 0.918432 5.8689 0.845561C5.7212 0.699691 5.53787 0.563497 5.3735 0.452427C5.20563 0.338992 5.04001 0.240097 4.91773 0.170181C4.85619 0.134991 4.80467 0.106597 4.7681 0.0867769L4.72489 0.0635902L4.71272 0.0571676L4.70919 0.0553177L4.70808 0.0547418L4.7077 0.0545421L4.70755 0.0544645C4.70749 0.054432 4.70743 0.0544018 4.47682 0.498047ZM2.80446 2.81728C3.36056 2.05737 3.95083 1.42576 4.48364 1.07431C4.58195 1.13185 4.69853 1.20323 4.81361 1.28099C4.9576 1.3783 5.08264 1.47452 5.16621 1.55706C5.1823 1.57294 5.19497 1.58651 5.20481 1.5977C5.19876 1.65011 5.18762 1.72463 5.17097 1.83313C5.14746 1.98637 5.11763 2.18381 5.10693 2.38839C5.08699 2.77002 5.12231 3.35099 5.58556 3.73579C5.90902 4.00447 6.30053 3.9628 6.56115 3.89691C6.83132 3.82861 7.11982 3.69364 7.36459 3.57749L7.43192 3.5455C7.66875 3.4329 7.87926 3.33281 8.07753 3.26459C8.29441 3.18997 8.4206 3.18202 8.48712 3.19549C8.49021 3.19859 8.50686 3.21165 8.69285 3.49135C8.81933 3.74585 8.93506 4.10681 9.03521 4.53567C9.23425 5.38804 9.34933 6.40874 9.39857 7.13649C9.40609 7.24769 9.45055 7.35318 9.52488 7.43622L11.992 10.1923C12.6132 10.8356 12.8001 11.4592 12.7375 11.9146C12.6817 12.3201 12.4168 12.6847 11.8726 12.8728C9.82463 10.5771 7.3889 8.30451 5.07369 6.25179C3.82416 5.14392 2.73187 5.04157 1.30503 5.41158C1.64178 4.62629 2.17904 3.6719 2.80446 2.81728Z" clip-rule="evenodd"/>
+        </svg>
+        <span>Foot<em>note</em></span>
+      </a>
+      <a class="nav-cta" href="https://footnote-tan.vercel.app">Open app</a>
+    </div>
+  </nav>
+
+  <hr class="rule">
+
+  <!-- ─── Hero ──────────────────────────────────────── -->
+  <section class="hero">
+    <div class="container container--narrow">
+      <h1>The thought that arrived <em>halfway down the block.</em><br>It&#8217;s still there.</h1>
+      <p class="hero-sub">A walking journal. Each note tagged with the time and place it arrived.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="https://footnote-tan.vercel.app">Open the app</a>
+        <p class="hero-hint">
+          It&#8217;s a URL. No download, no app store. &nbsp;<a class="link-philosophy" href="https://footnote-tan.vercel.app" style="font-family:var(--font-mono);font-size:.68rem;">Add to home screen &rarr;</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ─── Insight ───────────────────────────────────── -->
+  <section class="insight">
+    <div class="container container--narrow">
+      <p class="section-label">The idea</p>
+      <div class="insight-body">
+        <p>There&#8217;s a reason Rousseau walked. And Jobs, and Darwin. Movement does something to thought, loosens it, sends it somewhere the desk never could.</p>
+        <p>Walk-ideas are a specific kind of thing. Sparkling, right-brained, half-formed. They arrive connected and urgent, and then the moment you stop moving, they scatter. You get home and the thread is gone. What you actually need isn&#8217;t just to take a note. It&#8217;s a way to hold on to what came to you out there, and do something with it.</p>
+        <p>Footnote is that. Minimal enough that opening it doesn&#8217;t interrupt the walk. Structured enough to make sense of it after.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ─── How it works ──────────────────────────────── -->
+  <section class="how">
+    <div class="container">
+      <p class="section-label">How it works</p>
+      <div class="how-grid">
+
+        <div class="how-step">
+          <p class="step-num">01</p>
+          <div class="step-divider"></div>
+          <p class="step-title">Start a walk</p>
+          <p class="step-body">Open the app and begin. No setup, no account, nothing to configure. It&#8217;s ready when you are.</p>
+        </div>
+
+        <div class="how-step">
+          <p class="step-num">02</p>
+          <div class="step-divider"></div>
+          <p class="step-title">Type or talk</p>
+          <p class="step-body">When something comes to you, tap and write. One sentence or several, whatever the moment asks for.</p>
+        </div>
+
+        <div class="how-step">
+          <p class="step-num">03</p>
+          <div class="step-divider"></div>
+          <p class="step-title">It&#8217;s saved with the moment</p>
+          <p class="step-body">Every note records the exact time and your location. Later, you can read it back as a journal of the walk.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ─── Science ─────────────────────────────────────── -->
+  <section class="science">
+    <div class="container container--narrow">
+      <p class="section-label">The science</p>
+      <div class="science-body">
+        <p>Researchers at Stanford found that walking increased creative output in 81% of participants. The effect held even after sitting back down. Walking activates divergent thinking, the kind that generates novel connections, not just efficient ones.</p>
+        <p>Darwin walked the same gravel loop at Down House every day for decades, counting laps with a pile of flints. Rousseau wrote: &#8220;My mind only works with my legs.&#8221; Steve Jobs held every serious conversation on foot. These aren&#8217;t coincidences.</p>
+        <p>Exercise increases BDNF, the protein that supports new neural connections. Rhythmic movement frees the prefrontal cortex. A walk is not a break from thinking. It&#8217;s a different kind of thinking.</p>
+      </div>
+      <div class="science-citations">
+        <a href="https://doi.org/10.1037/a0036577" class="citation-link" target="_blank" rel="noopener">Oppezzo &amp; Schwartz, 2014: walking and creative thinking (Stanford)</a>
+        <a href="https://doi.org/10.1016/S0166-2236(02)02143-4" class="citation-link" target="_blank" rel="noopener">Cotman &amp; Berchtold, 2002: exercise and BDNF brain plasticity</a>
+        <a href="https://doi.org/10.3390/brainsci11050546" class="citation-link" target="_blank" rel="noopener">Aga et al., 2021: aerobic exercise and divergent thinking</a>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ─── Privacy ───────────────────────────────────── -->
+  <section class="privacy">
+    <div class="container container--narrow">
+      <p class="section-label">Privacy</p>
+      <p class="privacy-statement">
+        Your notes live on your device and nowhere else. <strong>Footnote has no server, no account, no database with your name in it.</strong> There&#8217;s no company that could lose your data, sell it, or shut down and take it with them.
+      </p>
+      <p class="privacy-footnote">
+        GPS coordinates are stored locally with each note and used only to show you where a thought occurred. They never leave your phone.
+      </p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ─── Pricing ───────────────────────────────────── -->
+  <section class="pricing">
+    <div class="container">
+      <p class="section-label">Pricing</p>
+      <div class="pricing-grid">
+
+        <!-- Free -->
+        <div class="tier-card">
+          <p class="tier-badge">Always free</p>
+          <p class="tier-name">Footnote</p>
+          <p class="tier-price">Free, forever</p>
+          <div class="tier-divider"></div>
+          <p class="tier-includes">Includes</p>
+          <ul class="tier-items">
+            <li>Unlimited walks and notes</li>
+            <li>Time + GPS on every entry</li>
+            <li>Works offline, no account</li>
+            <li>Export to plain text</li>
+          </ul>
+          <a class="tier-cta" href="https://footnote-tan.vercel.app">Open the app</a>
+        </div>
+
+        <!-- Pro -->
+        <div class="tier-card tier-card--pro">
+          <p class="tier-badge tier-badge--pro">One-time purchase</p>
+          <p class="tier-name">Footnote Pro</p>
+          <p class="tier-price">$4.99 at launch &nbsp;<s>$7.99</s><br>No subscription. One price, forever.</p>
+          <div class="tier-divider"></div>
+          <p class="tier-includes">Everything in free, plus</p>
+          <ul class="tier-items">
+            <li>Export to Markdown</li>
+            <li>Walk history with map view</li>
+            <li>3 months free, then permanent</li>
+          </ul>
+          <a class="tier-cta tier-cta--primary" href="https://footnote-tan.vercel.app">Get Pro</a>
+        </div>
+
+        <!-- AI Pack -->
+        <div class="tier-card">
+          <p class="tier-badge">Waitlist</p>
+          <p class="tier-name">AI Pack</p>
+          <p class="tier-price">~$3 / month<br>Not yet available</p>
+          <div class="tier-divider"></div>
+          <p class="tier-includes">Adds to Pro</p>
+          <ul class="tier-items">
+            <li>Voice transcription while walking</li>
+            <li>Light AI cleanup of transcripts</li>
+            <li>Early access for waitlist members</li>
+          </ul>
+          <a class="tier-cta tier-cta--muted" href="https://footnote-tan.vercel.app">Join the waitlist</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <!-- ─── Footer ────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <a class="footer-wordmark" href="/about.html" aria-label="Footnote — home">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path fill="#8B6F47" d="M11.9099 13.3852C13.468 12.9364 13.7277 11.2694 12.3644 9.85887L9.89729 7.10274C9.79687 5.61865 9.42688 2.90237 8.60722 2.71002C7.78756 2.51768 6.442 3.79732 5.9049 3.35117C5.3678 2.90503 5.71014 1.90858 5.71014 1.52389C5.71014 1.1392 4.47668 0.498047 4.47668 0.498047C3.08919 1.22169 1.53298 3.61452 0.863386 5.16927C0.615782 5.74419 0.79742 6.38044 1.2215 6.84087C3.15256 8.93748 5.09835 11 7.21708 12.9235C7.59579 13.2673 8.09311 13.4518 8.60722 13.4687L8.67724 13.471C9.83907 13.5093 10.6712 13.5367 11.9099 13.3852Z"/>
+          <path fill="#1C1814" fill-rule="evenodd" d="M4.47682 0.498047L4.70743 0.0544018C4.56266 -0.0208504 4.39027 -0.0207316 4.24561 0.0547201C3.4461 0.471702 2.65435 1.32909 1.99747 2.22672C1.33051 3.1381 0.754872 4.15751 0.404306 4.9715C0.0604182 5.76998 0.330432 6.61131 0.853862 7.17961C2.78633 9.27774 4.74481 11.3542 6.88114 13.2937C7.35592 13.7247 7.96992 13.948 8.59092 13.9684L8.66879 13.971C9.82808 14.0092 10.6933 14.0378 11.9708 13.8815C11.997 13.8783 12.023 13.873 12.0485 13.8657C12.9939 13.5933 13.6087 12.9192 13.7281 12.0508C13.8437 11.2103 13.4813 10.2981 12.7308 9.51845L10.3838 6.89644C10.3269 6.15415 10.209 5.1649 10.009 4.30828C9.90165 3.84852 9.76492 3.40159 9.58836 3.04631C9.4284 2.72444 9.16267 2.32675 8.72159 2.22325C8.37655 2.14228 8.02818 2.22404 7.75219 2.319C7.49712 2.40676 7.2344 2.5319 7.00817 2.63966L6.93589 2.67405C6.67467 2.798 6.47486 2.88727 6.31606 2.92741C6.25813 2.94206 6.22273 2.94586 6.20345 2.9464C6.13939 2.87629 6.09026 2.73346 6.10557 2.44059C6.11333 2.2922 6.13551 2.14052 6.1594 1.98478L6.16479 1.94992C6.1849 1.82 6.21029 1.65605 6.21029 1.52389C6.21029 1.34611 6.14129 1.20106 6.08212 1.10571C6.02025 1.00601 5.94269 0.918432 5.8689 0.845561C5.7212 0.699691 5.53787 0.563497 5.3735 0.452427C5.20563 0.338992 5.04001 0.240097 4.91773 0.170181C4.85619 0.134991 4.80467 0.106597 4.7681 0.0867769L4.72489 0.0635902L4.71272 0.0571676L4.70919 0.0553177L4.70808 0.0547418L4.7077 0.0545421L4.70755 0.0544645C4.70749 0.054432 4.70743 0.0544018 4.47682 0.498047ZM2.80446 2.81728C3.36056 2.05737 3.95083 1.42576 4.48364 1.07431C4.58195 1.13185 4.69853 1.20323 4.81361 1.28099C4.9576 1.3783 5.08264 1.47452 5.16621 1.55706C5.1823 1.57294 5.19497 1.58651 5.20481 1.5977C5.19876 1.65011 5.18762 1.72463 5.17097 1.83313C5.14746 1.98637 5.11763 2.18381 5.10693 2.38839C5.08699 2.77002 5.12231 3.35099 5.58556 3.73579C5.90902 4.00447 6.30053 3.9628 6.56115 3.89691C6.83132 3.82861 7.11982 3.69364 7.36459 3.57749L7.43192 3.5455C7.66875 3.4329 7.87926 3.33281 8.07753 3.26459C8.29441 3.18997 8.4206 3.18202 8.48712 3.19549C8.49021 3.19859 8.50686 3.21165 8.69285 3.49135C8.81933 3.74585 8.93506 4.10681 9.03521 4.53567C9.23425 5.38804 9.34933 6.40874 9.39857 7.13649C9.40609 7.24769 9.45055 7.35318 9.52488 7.43622L11.992 10.1923C12.6132 10.8356 12.8001 11.4592 12.7375 11.9146C12.6817 12.3201 12.4168 12.6847 11.8726 12.8728C9.82463 10.5771 7.3889 8.30451 5.07369 6.25179C3.82416 5.14392 2.73187 5.04157 1.30503 5.41158C1.64178 4.62629 2.17904 3.6719 2.80446 2.81728Z" clip-rule="evenodd"/>
+        </svg>
+        <span>Foot<em>note</em></span>
+      </a>
+      <ul class="footer-links">
+        <li><a class="link-philosophy" href="https://footnote-tan.vercel.app">App</a></li>
+        <li><a class="link-philosophy" href="/roadmap.html">Roadmap</a></li>
+        <li><a class="link-philosophy" href="/philosophy.html">Philosophy</a></li>
+      </ul>
+      <!-- No copyright. No "Made by." We trust the work. See /philosophy. -->
+    </div>
+  </footer>
+
+  <!-- ─── Install hint ──────────────────────────────── -->
+  <div id="install-hint" role="dialog" aria-label="Add to home screen instructions">
+    <button class="close-hint" onclick="document.getElementById('install-hint').classList.remove('visible')" aria-label="Dismiss">&#215;</button>
+    <p><strong>On iPhone:</strong> tap the Share button in Safari, then choose &#8220;Add to Home Screen.&#8221;</p>
+    <p><strong>On Android:</strong> tap the browser menu (&#8942;) and choose &#8220;Add to Home Screen&#8221; or &#8220;Install app.&#8221;</p>
+  </div>
+
+</body>
+</html>

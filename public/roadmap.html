@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Footnote roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F7F3EC; --ink: #1C1814;
+      --tan-accent: #8B6F47; --gps-dot: #9E8A70;
+      --rule: #D4C4A8; --tan-fill: rgba(139,111,71,.10);
+      --font-body: 'EB Garamond', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', Menlo, monospace;
+    }
+    html, body { min-height: 100%; background: var(--bg); color: var(--ink); font-family: var(--font-body); }
+    body { padding: 40px 24px 80px; max-width: 560px; margin: 0 auto; }
+    .back { font-family: var(--font-mono); font-size: .72rem; color: var(--gps-dot); text-decoration: none; display: inline-block; margin-bottom: 32px; }
+    .wordmark { display: flex; align-items: center; gap: 8px; margin-bottom: 32px; font-family: var(--font-body); font-size: 1.1rem; color: var(--ink); letter-spacing: -.01em; }
+    .wordmark em { font-style: italic; color: var(--tan-accent); }
+    .back:hover { color: var(--tan-accent); }
+    h1 { font-size: 1.8rem; font-weight: 400; font-style: italic; color: var(--tan-accent); margin-bottom: 8px; }
+    .subtitle { font-family: var(--font-mono); font-size: .72rem; color: var(--gps-dot); margin-bottom: 40px; }
+    .feature-list { display: flex; flex-direction: column; gap: 16px; }
+    .feature-card { background: var(--tan-fill); border: 1px solid rgba(139,111,71,.18); border-radius: 10px; padding: 20px; }
+    .feature-name { font-size: 1.15rem; color: var(--ink); margin-bottom: 6px; }
+    .feature-desc { font-family: var(--font-body); font-size: .9rem; color: var(--gps-dot); line-height: 1.55; margin-bottom: 14px; }
+    .feature-stats { display: flex; gap: 16px; }
+    .stat { font-family: var(--font-mono); font-size: .72rem; color: var(--tan-accent); }
+    .stat-label { color: var(--gps-dot); margin-left: 4px; }
+    .loading { font-style: italic; color: var(--gps-dot); font-size: 1rem; }
+    .footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--rule); font-family: var(--font-mono); font-size: .72rem; color: var(--gps-dot); }
+    .footer a { color: var(--tan-accent); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <a class="wordmark" href="/">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path fill="#8B6F47" d="M11.9099 13.3852C13.468 12.9364 13.7277 11.2694 12.3644 9.85887L9.89729 7.10274C9.79687 5.61865 9.42688 2.90237 8.60722 2.71002C7.78756 2.51768 6.442 3.79732 5.9049 3.35117C5.3678 2.90503 5.71014 1.90858 5.71014 1.52389C5.71014 1.1392 4.47668 0.498047 4.47668 0.498047C3.08919 1.22169 1.53298 3.61452 0.863386 5.16927C0.615782 5.74419 0.79742 6.38044 1.2215 6.84087C3.15256 8.93748 5.09835 11 7.21708 12.9235C7.59579 13.2673 8.09311 13.4518 8.60722 13.4687L8.67724 13.471C9.83907 13.5093 10.6712 13.5367 11.9099 13.3852Z"/>
+      <path fill="#1C1814" fill-rule="evenodd" d="M4.47682 0.498047L4.70743 0.0544018C4.56266 -0.0208504 4.39027 -0.0207316 4.24561 0.0547201C3.4461 0.471702 2.65435 1.32909 1.99747 2.22672C1.33051 3.1381 0.754872 4.15751 0.404306 4.9715C0.0604182 5.76998 0.330432 6.61131 0.853862 7.17961C2.78633 9.27774 4.74481 11.3542 6.88114 13.2937C7.35592 13.7247 7.96992 13.948 8.59092 13.9684L8.66879 13.971C9.82808 14.0092 10.6933 14.0378 11.9708 13.8815C11.997 13.8783 12.023 13.873 12.0485 13.8657C12.9939 13.5933 13.6087 12.9192 13.7281 12.0508C13.8437 11.2103 13.4813 10.2981 12.7308 9.51845L10.3838 6.89644C10.3269 6.15415 10.209 5.1649 10.009 4.30828C9.90165 3.84852 9.76492 3.40159 9.58836 3.04631C9.4284 2.72444 9.16267 2.32675 8.72159 2.22325C8.37655 2.14228 8.02818 2.22404 7.75219 2.319C7.49712 2.40676 7.2344 2.5319 7.00817 2.63966L6.93589 2.67405C6.67467 2.798 6.47486 2.88727 6.31606 2.92741C6.25813 2.94206 6.22273 2.94586 6.20345 2.9464C6.13939 2.87629 6.09026 2.73346 6.10557 2.44059C6.11333 2.2922 6.13551 2.14052 6.1594 1.98478L6.16479 1.94992C6.1849 1.82 6.21029 1.65605 6.21029 1.52389C6.21029 1.34611 6.14129 1.20106 6.08212 1.10571C6.02025 1.00601 5.94269 0.918432 5.8689 0.845561C5.7212 0.699691 5.53787 0.563497 5.3735 0.452427C5.20563 0.338992 5.04001 0.240097 4.91773 0.170181C4.85619 0.134991 4.80467 0.106597 4.7681 0.0867769L4.72489 0.0635902L4.71272 0.0571676L4.70919 0.0553177L4.70808 0.0547418L4.7077 0.0545421L4.70755 0.0544645C4.70749 0.054432 4.70743 0.0544018 4.47682 0.498047ZM2.80446 2.81728C3.36056 2.05737 3.95083 1.42576 4.48364 1.07431C4.58195 1.13185 4.69853 1.20323 4.81361 1.28099C4.9576 1.3783 5.08264 1.47452 5.16621 1.55706C5.1823 1.57294 5.19497 1.58651 5.20481 1.5977C5.19876 1.65011 5.18762 1.72463 5.17097 1.83313C5.14746 1.98637 5.11763 2.18381 5.10693 2.38839C5.08699 2.77002 5.12231 3.35099 5.58556 3.73579C5.90902 4.00447 6.30053 3.9628 6.56115 3.89691C6.83132 3.82861 7.11982 3.69364 7.36459 3.57749L7.43192 3.5455C7.66875 3.4329 7.87926 3.33281 8.07753 3.26459C8.29441 3.18997 8.4206 3.18202 8.48712 3.19549C8.49021 3.19859 8.50686 3.21165 8.58383 3.27199C8.69285 3.49135 8.81933 3.74585 8.93506 4.10681C9.03521 4.53567 9.23425 5.38804 9.34933 6.40874C9.39857 7.13649 9.40609 7.24769 9.45055 7.35318C9.52488 7.43622L11.992 10.1923C12.6132 10.8356 12.8001 11.4592 12.7375 11.9146C12.6817 12.3201 12.4168 12.6847 11.8726 12.8728C9.82463 10.5771 7.3889 8.30451 5.07369 6.25179C3.82416 5.14392 2.73187 5.04157 1.30503 5.41158C1.64178 4.62629 2.17904 3.6719 2.80446 2.81728Z" clip-rule="evenodd"/>
+    </svg>
+    Foot<em>note</em>
+  </a>
+  <h1>Roadmap</h1>
+  <p class="subtitle">What we&#8217;re thinking about building. Tap to show interest.</p>
+
+  <div id="features" class="feature-list">
+    <p class="loading">Loading&#8230;</p>
+  </div>
+
+  <div class="footer">
+    <p>
+      <a class="link-philosophy" href="/about.html">About</a> &middot;
+      <a class="link-philosophy" href="https://footnote-tan.vercel.app">App</a> &middot;
+      <a class="link-philosophy" href="/philosophy.html">Philosophy</a>
+    </p>
+    <!-- No copyright. No "Made by." We trust the work. See /philosophy. -->
+  </div>
+
+  <script>
+    fetch('/api/vote/results')
+      .then(r => r.json())
+      .then(features => {
+        const el = document.getElementById('features')
+        if (!features.length) { el.innerHTML = '<p class="loading">Nothing to show yet.</p>'; return }
+        el.innerHTML = features.map(f => `
+          <div class="feature-card">
+            <p class="feature-name">${esc(f.label)}</p>
+            <p class="feature-desc">${esc(f.desc)}</p>
+            <div class="feature-stats">
+              <span class="stat">${f.taps}<span class="stat-label">taps</span></span>
+              <span class="stat">${f.people}<span class="stat-label">people</span></span>
+            </div>
+          </div>
+        `).join('')
+      })
+      .catch(() => {
+        document.getElementById('features').innerHTML = '<p class="loading">Couldn&#8217;t load results.</p>'
+      })
+
+    function esc(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    }
+  </script>
+</body>
+</html>
