@@ -58,7 +58,7 @@ async function boot() {
   })
 
   if (resumed) {
-    editor.setActive(true)
+    await editor.handleResume(resumed)
     logger.info('app', 'session_resumed', { sessionId: resumed.id })
   }
 

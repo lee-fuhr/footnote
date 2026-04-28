@@ -4,6 +4,34 @@ All notable changes to Foot.Note are documented here.
 
 ---
 
+## v0.2.0 — 2026-04-28
+
+### iCloud auto-export, flat-doc Coda review, session resume, idea form
+
+**iCloud export**
+- Walk end automatically exports to a user-chosen iCloud Drive folder as a `.md` file
+- First walk opens a folder picker (requires a user gesture — walk end satisfies this)
+- Subsequent walks write silently; "Walk saved to iCloud." toast on success
+- Permission lapses gracefully — walk is always saved locally regardless
+
+**Flat-doc review (FlatCodaSheet)**
+- Post-walk review sheet for flat-doc sessions: shows full walk text, ★ Keep / Done
+- Skipped automatically for legacy (line-based) sessions, which still use the old Coda sheet
+- Session list shows ★ badge for starred walks and "Review" button for unreviewed flat-docs
+
+**Session resume**
+- Returning to the app mid-walk now restores the flat-doc textarea with saved body content
+- Legacy sessions resume with their line list, same as before
+
+**Community**
+- "Got an idea? →" button in session list opens a pre-filled GitHub issue form
+- `/roadmap` redirects to the live GitHub Project board
+
+**Voice indicator**
+- Pulsing dot appears in footer when voice recognition is active
+
+---
+
 ## v0.1.0 — 2026-04-28
 
 ### Phase 0: flat-doc + voice

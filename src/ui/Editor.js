@@ -420,5 +420,15 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     }
   }
 
-  return { handleStart, setActive }
+  async function handleResume(session) {
+    if (session.body !== null) {
+      mountFlatDoc(session)
+    } else {
+      mountLegacy(session)
+      await _legacyView.loadLines(session.id)
+    }
+    setActive(true)
+  }
+
+  return { handleStart, handleResume, setActive }
 }

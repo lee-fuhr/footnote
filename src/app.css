@@ -494,6 +494,23 @@ html, body {
   flex: 1;
 }
 
+/* Voice-active indicator (pulsing dot, same pattern as GPS) */
+.voice-indicator {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--tan-accent);
+  flex-shrink: 0;
+}
+
+.voice-indicator--active {
+  animation: voice-pulse .9s ease infinite;
+}
+
+@keyframes voice-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .4; transform: scale(.7); }
+}
+
 /* ── Session list ───────────────────────────────────────────────────────── */
 #session-list {
   border-top: 2px solid var(--rule);
