@@ -2,7 +2,10 @@ import { getAllSessions, getSessionLines, deleteSession } from '../db/index.js'
 import { shareSessionAsMarkdown, shareSessionAsText } from '../export/share.js'
 import { confirmSheet } from './ConfirmSheet.js'
 import { codaSheet } from './CodaSheet.js'
+import { flatCodaSheet } from './FlatCodaSheet.js'
 import { isCoded } from '../session/coded.js'
+import { isSessionStarred } from '../session/starred.js'
+import { ideaSheet } from './IdeaSheet.js'
 
 function formatDate(epochMs) {
   return new Date(epochMs).toLocaleDateString('en-US', {
@@ -30,6 +33,12 @@ export function SessionList(container, { onSessionSelect } = {}) {
   el.className = 'session-list'
   container.appendChild(el)
 
+  const ideaBtn = document.createElement('button')
+  ideaBtn.className = 'session-list-idea-btn'
+  ideaBtn.textContent = 'Got an idea? →'
+  ideaBtn.addEventListener('click', () => ideaSheet())
+  container.appendChild(ideaBtn)
+
   async function render() {
     const sessions = await getAllSessions()
 
@@ -44,7 +53,9 @@ export function SessionList(container, { onSessionSelect } = {}) {
               <span class="session-meta">${formatTime(s.startedAt)} · ${formatDuration(s.startedAt, s.endedAt)}</span>
             </div>
             <div class="session-card-actions">
-              ${s.lineCount > 0 && !isCoded(s.id) ? `<button class="btn-coda" data-id="${s.id}" title="Review with Coda">&#9733; Review</button>` : ''}
+              ${isSessionStarred(s.id) ? `<span class="session-star" aria-label="Starred walk">&#9733;</span>` : ''}
+              ${s.body !== null && s.body && !isCoded(s.id) ? `<button class="btn-flat-coda" data-id="${s.id}" title="Review walk">&#9733; Review</button>` : ''}
+              ${s.body === null && s.lineCount > 0 && !isCoded(s.id) ? `<button class="btn-coda" data-id="${s.id}" title="Review with Coda">&#9733; Review</button>` : ''}
               <button class="btn-export-md" data-id="${s.id}" title="Export as Markdown">.md</button>
               <button class="btn-export-txt" data-id="${s.id}" title="Export as plain text">.txt</button>
               <button class="btn-delete" data-id="${s.id}">delete</button>
@@ -56,6 +67,15 @@ export function SessionList(container, { onSessionSelect } = {}) {
       card.addEventListener('click', e => {
         if (e.target.closest('button')) return
         onSessionSelect?.(card.dataset.id)
+      })
+    })
+
+    el.querySelectorAll('.btn-flat-coda').forEach(btn => {
+      btn.addEventListener('click', async e => {
+        e.stopPropagation()
+        const session = sessions.find(s => s.id === btn.dataset.id)
+        if (session) flatCodaSheet(session)
+        document.addEventListener('footnote:coda-complete', () => render(), { once: true })
       })
     })
 

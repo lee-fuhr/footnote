@@ -1,6 +1,7 @@
 import { startSession, endSession, getState, getCurrentSessionId } from '../session/manager.js'
 import { appendToBody, flushBody, setBodyTimer } from '../db/index.js'
 import { hasFolder, requestFolder, autoExport } from '../export/icloud.js'
+import { flatCodaSheet } from './FlatCodaSheet.js'
 import { getLineLocation } from '../gps/index.js'
 import { GpsIndicator } from './GpsIndicator.js'
 import { confirmSheet } from './ConfirmSheet.js'
@@ -245,6 +246,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
       setActive(false)
       showToast(emptyState, emptyPrompt, exportResult.saved ? 'Walk saved to iCloud.' : 'Walk saved.')
       onSessionEnd?.()
+      flatCodaSheet(sessionForExport)
     }
 
     textarea.addEventListener('input', handleInput)
