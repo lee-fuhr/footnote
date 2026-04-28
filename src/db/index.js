@@ -196,6 +196,20 @@ export async function getStarredLines(sessionId) {
   return lines.filter(l => l.starred === true).sort((a, b) => a.createdAt - b.createdAt)
 }
 
+// ── Metadata (generic key-value) ────────────────────────────────────────────
+
+export async function getMeta(key) {
+  const txn = tx(['metadata'], 'readonly')
+  const record = await get('metadata', key, txn)
+  return record?.value ?? null
+}
+
+export async function storeMeta(key, value) {
+  const txn = tx(['metadata'], 'readwrite')
+  await put('metadata', { key, value }, txn)
+  await awaitTx(txn)
+}
+
 // ── Body (flat-doc, v3) ──────────────────────────────────────────────────────
 
 // Module-level debounce timer shared with keyboard input handler.

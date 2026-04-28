@@ -1,5 +1,6 @@
 import { startSession, endSession, getState, getCurrentSessionId } from '../session/manager.js'
 import { appendToBody, flushBody, setBodyTimer } from '../db/index.js'
+import { hasFolder, requestFolder, autoExport } from '../export/icloud.js'
 import { getLineLocation } from '../gps/index.js'
 import { GpsIndicator } from './GpsIndicator.js'
 import { confirmSheet } from './ConfirmSheet.js'
@@ -231,9 +232,18 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
 
       await flushBody(sessionId, textarea.value)
       await endSession()
+
+      // iCloud auto-export — first walk opens the folder picker (walk-end
+      // is a user gesture, so showDirectoryPicker is allowed). Subsequent
+      // walks write silently. If the user cancels or permission lapses,
+      // the walk is still saved locally.
+      const sessionForExport = { ...session, body: textarea.value, endedAt: Date.now() }
+      if (!(await hasFolder())) await requestFolder()
+      const exportResult = await autoExport(sessionForExport)
+
       textarea.value = ''
       setActive(false)
-      showToast(emptyState, emptyPrompt, 'Walk saved.')
+      showToast(emptyState, emptyPrompt, exportResult.saved ? 'Walk saved to iCloud.' : 'Walk saved.')
       onSessionEnd?.()
     }
 
