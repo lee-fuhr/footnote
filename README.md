@@ -1,22 +1,35 @@
-# Foot.Note
+# Footnote
 
 A walking journal. Open source, offline-first PWA.
 
 ---
 
-You go for a walk. Thoughts show up. You speak or type. You walk home. You have a document.
+Walking creates a specific kind of thinking — not quite focused, not quite idle — where connections form that won't form at a desk. Most people lose those thoughts before they get home.
 
-That's it.
+Footnote is built for that window. You open it, you walk, you speak or type. When you get home, your thinking is there — timestamped, GPS-tagged, in a file in your iCloud Drive. Nothing to retrieve. It's just there.
 
-Foot.Note is built on the idea that walking produces a specific kind of thinking — the kind Jobs, Aristotle, and Darwin swore by. The app shouldn't get in the way of that. No save button. No entry management. One continuous document per walk, always saving.
+## Free
 
-## What it is
+- One continuous document per walk, always saving
+- Speak using Siri or type — both feed the same doc
+- No account, nothing stored on a server
+- Works without signal
+- Notes sync to iCloud Drive automatically — no export step
 
-- **Offline-first PWA** — works without internet, no account required
-- **Flat-doc architecture** — one document per walk, auto-saves on every keystroke
-- **Voice + text** — speak or type, both feed the same document
-- **Export anywhere** — walks export as clean Markdown or plain text
-- **No counts** — no steps, no pace, no gamification
+## Pro — $4.99, one time
+
+- Markdown export
+- Richer walk history
+
+## AI — coming soon
+
+An optional subscription. Cleans up what Siri gets wrong. On-device, private.
+
+---
+
+No save button. No entry management. No counts, no pace, no gamification.
+
+The app is a PWA. That's intentional — it asks less of your device and more of your attention. A native iOS app is in the works.
 
 ## Quick start
 
@@ -25,7 +38,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`. Add to home screen on iOS for the full PWA experience.
+Open `http://localhost:5173`. Add to home screen on iOS for the full experience.
 
 ```bash
 npm test         # Vitest
@@ -38,7 +51,7 @@ Vanilla JS, Vite, IndexedDB. No framework, no server, no accounts. Hosted on Ver
 
 ## Roadmap
 
-The public roadmap lives at [github.com/users/lee-fuhr/projects/4](https://github.com/users/lee-fuhr/projects/4). Phase 0 (flat-doc + voice) is shipped. Phase 0.5 is next.
+[footnote-tan.vercel.app/roadmap](https://footnote-tan.vercel.app/roadmap) — Phase 0 is shipped. Phase 1 is next.
 
 ## Contributing
 

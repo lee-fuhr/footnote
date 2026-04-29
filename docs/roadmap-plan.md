@@ -1,78 +1,103 @@
-# Footnote roadmap plan
+# Footnote roadmap
 
-*Synthesized 2026-04-28. Architectural direction: View A (flat-doc). External review: DeepSeek (single voice — Groq 429, Gemini quota-exhausted, Ollama paused at synthesis time). Lee's call confirmed before writing.*
-
----
-
-## The pivot
-
-The current model (discrete time-stamped entries) is creating the feeling that your words might not be saved. That's not a UI bug — it's the architecture. Replacing it with one flat document per walk that always saves dissolves most of the first-walk findings as side effects.
-
-**North star for the next 2 weeks:** You start a walk. Mic turns on. You speak. Text appears. You walk home. You have a document. Nothing to tap, nothing to save.
+*Live board: [footnote-tan.vercel.app/roadmap](https://footnote-tan.vercel.app/roadmap). This doc is the narrative behind the phases — the "why" that the board doesn't show.*
 
 ---
 
-## Phase 0 — Flat-doc + voice-first MVP (2 weeks, tight scope)
+## How phases work
 
-**The one-sentence test:** Lee walks, speaks, walks home, reads a document. If that doesn't work cleanly, Phase 0 isn't done.
+Each phase has a single gate question. You don't advance until that question is answered yes.
 
-**What ships:**
-- One continuous document per walk (replaces discrete entries). Auto-saves on every keystroke — no save button, no enter-key ambiguity.
-- Mic on by default when a walk is active. Voice transcription appends to the document in real time. No mic toggle during the walk.
-- "End walk" tap button (honest and simple). Auto-detection comes later if the tap turns out to be a problem.
-- Grammarly fix on the input field (5-minute fix, goes in with everything else).
-
-**What does NOT ship in Phase 0:** Margin timestamps, Tally submission form, GPS metadata overlay. Those go to Phase 0.5 once the core walk works.
-
-**First walk migration:** The 2026-04-28 walk (the one that triggered all of this) stays intact as a legacy session in the old format. It's not migrated — it's preserved. All future walks use the new flat-doc model.
-
-**Roadmap mechanics:** Notion board. Lee adds items from the walk notes queue. Tally form and public submissions are Phase 0.5.
+| Phase | Gate question |
+|-------|---------------|
+| 0 | Does the basic walk loop work? |
+| 0.5 | Does it work on an actual walk in the field? |
+| 1 | Would I use this every day? |
+| 2 | Can I share this with 10 people I know? |
+| 3 | Can I share this with strangers? |
+| 4 | Is voice so good that phone-in-pocket is the primary mode? |
+| Someday | Is there a real user base to build this for? |
 
 ---
 
-## Phase 1 — Trust + navigation (after first walks on the new model)
+## Phase 0 — Core walk built ✓
 
-Validate that flat-doc actually fixed what it promised. Then:
+**Gate:** Does the basic walk loop work?
 
-- **B1 (URL bar `**` bug):** May auto-resolve if the new doc doesn't render markdown `**` tokens in a way iOS Safari can grab. If not, investigate and fix the markdown-in-URL leak.
-- **Back navigation:** Simplified — session list is always accessible from the header.
-- **Walk-end UX:** Informed by how Phase 0 walks actually feel. Is the tap-to-end button getting used, forgotten, or resented?
-- **Better STT research (A1):** Siri quality was bad. Evaluate on-device Whisper, third-party API options, Apple Intelligence STT timeline for PWAs. Decision gate before Phase 2.
+The flat-doc architecture. One document per walk, auto-saves on every keystroke. Voice and keyboard both append to the same doc. Walk-end button. Grammarly disabled. Empty state copy. Everything deploys.
 
 ---
 
-## Phase 2 — Voice-first walking (after STT decision)
+## Phase 0.5 — Field-tested ✓
 
-- AirPods integration (H2): voice control without phone in hand
-- Apple Health mindful minutes (H3): low-effort, philosophy-aligned
-- Improved STT based on Phase 1 research
+**Gate:** Does it work on an actual walk in the field?
 
----
-
-## Phase 3 — Deferred until voice-only is loved by real users
-
-- AI thought prompts (A3, AI Pack)
-- Two-person walk mode (M2) + consent flow (A4)
-- Apple Intelligence on-device summaries (H4)
+The gap between "works on localhost" and "works in your pocket on a street." Screen stays on during dictation (wakelock). Words are safe the instant Siri commits them (compositionend save). Phone lock flushes to disk (visibilitychange). Debounce cut to 100ms. iCloud master journal file — your notes are in iCloud when you get home, no export step. Slow transitions — the app moves at a different pace than everything else.
 
 ---
 
-## North star (1+ year, no phase)
+## Phase 1 — Daily driver ✓
 
-- Apple Watch standalone (H1)
-- Exercise/pace overlay (M1, opt-in only, honors "no counts" rule)
+**Gate:** Would I use this every day?
+
+Fixes that matter once you're a regular user. Back navigation. URL bar bug (Siri grabbing `**` markdown as a selection). STT quality research — understanding the landscape before committing to a direction. The walk experience is now good enough to be a habit.
+
+---
+
+## Phase 2 — Ready for friends
+
+**Gate:** Can I share this with 10 people I know?
+
+This is the trust-building phase. Before sharing with anyone, three questions need a yes: Is it provably private? Do users know where their notes live? Is the experience smooth enough that it reflects well?
+
+- **Security audit** — network monitor proof that nothing leaves the phone. The privacy promise is the product's strongest differentiator. It needs to be verifiable, not just claimed.
+- **Settings / admin UI** — show users what iCloud folder their notes live in, link directly to Files, let them change location. The framing is not "export" — notes are always there. Settings is visibility and control.
+- **Basic telemetry** — aggregate only (hours, notes, walks). Gives real numbers for launch conversations and future App Store copy.
+- **Gap-based auto-close** — 90-minute inactivity ends the walk automatically. Removes the end-walk button as a required step. Walk home, done.
+- **Resume UX** — returning to an active walk restores cleanly, cursor at end.
+- **iPhone Action Button** — Shortcuts integration for zero-tap start on supported hardware.
+
+---
+
+## Phase 3 — Public launch
+
+**Gate:** Can I share this with strangers?
+
+The Slack-post phase. The broader bureau. ProductHunt if it makes sense. What's needed: the experience is polished enough for people who have no relationship with the builder, the privacy story is proven, and there's a clear path to Pro revenue.
+
+- App Store listing (if/when PWA → native submission)
+- Better STT — based on Phase 1 research decision: on-device Whisper, third-party API, or Apple Intelligence
+- Polished walk history and journal view
+- Pro tier active and working ($4.99, one time)
+- Messaging framework fully applied to all surfaces
+
+---
+
+## Phase 4 — Voice-first
+
+**Gate:** Is voice so good that phone-in-pocket is the primary mode?
+
+After real users validate the core walk experience, go deeper on hands-free walking. These features don't matter until the basic loop is loved.
+
+- **AirPods integration** — voice control without phone in hand
+- **iPhone Action Button** — if not already in Phase 2, deepen the integration
+- **Apple Health mindful minutes** — low-effort, philosophy-aligned
+- **Improved STT** — whatever the Phase 1 research pointed to
+
+---
+
+## Someday
+
+Features that require a real user base to design for, or that depend on platform availability that doesn't exist yet.
+
+- Apple Watch standalone
+- AI thought prompts
+- Two-person walk mode with consent flow
+- Apple Intelligence on-device summaries
+- Exercise / pace overlay (opt-in only, honors "no counts" rule)
 
 ---
 
 ## Dropped
 
-- Roadmap voting built into the app (Notion board instead until 100+ walkers)
-- Apple Watch in any near-term phase
-
----
-
-## Pending before Phase 0 starts
-
-- **Pricing variant cleanup:** pricing-a.html, pricing-b.html, pricing-c.html are in /public/ and are deploy hazards. Delete before next deploy.
-- **Hero sentence on pricing.html:** Still unresolved. The four variants were compared in-browser but no pick was made. Needs a decision.
-- **C placements ("prefer X?" alt-paths):** Approved copy waiting. Build into about.html and pricing.html once hero sentence is resolved.
+- Roadmap voting built into the app — GitHub Projects instead, until there are 100+ walkers
