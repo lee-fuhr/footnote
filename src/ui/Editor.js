@@ -62,7 +62,6 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
       <div class="journal-history"></div>
       <div class="canvas-empty">
         <p class="canvas-empty-prompt">${headline}</p>
-        <p class="canvas-empty-tag">The thought that showed up at the corner.</p>
         <div class="canvas-empty-steps"></div>
         <a class="canvas-about-link link-philosophy" href="/about.html">About Footnote</a>
       </div>

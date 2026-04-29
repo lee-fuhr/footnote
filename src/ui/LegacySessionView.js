@@ -8,10 +8,9 @@ const PIN_SVG = `<svg width="10" height="13" viewBox="0 0 10 13" fill="none" xml
   <circle cx="5" cy="5" r="1.8" fill="var(--bg)"/>
 </svg>`
 
-const ICON_RETURN = `<svg width="12" height="11" viewBox="0 0 12 11" fill="none" aria-hidden="true" style="display:inline-block;vertical-align:middle;margin-left:2px;opacity:.65"><path d="M10 1.5v3a1 1 0 0 1-1 1H2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5 4 2.5 6.5 5 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-const ICON_MIC   = `<svg width="11" height="13" viewBox="0 0 11 13" fill="none" aria-hidden="true" style="display:inline-block;vertical-align:middle;margin-left:2px;opacity:.65"><rect x="3" y="0.5" width="5" height="7" rx="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 7.5a4.5 4.5 0 0 0 9 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5.5" y1="12" x2="5.5" y2="13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`
-const ICON_CLOCK = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style="display:inline-block;vertical-align:middle;margin-left:2px;opacity:.65"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6 3v3l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-const ICON_LOC   = `<svg width="10" height="12" viewBox="0 0 10 12" fill="none" aria-hidden="true" style="display:inline-block;vertical-align:middle;margin-left:2px;opacity:.65"><path d="M5 .5C2.8.5 1 2.4 1 4.6c0 3.2 4 7.4 4 7.4s4-4.2 4-7.4C9 2.4 7.2.5 5 .5z" stroke="currentColor" stroke-width="1.2"/><circle cx="5" cy="4.6" r="1.4" stroke="currentColor" stroke-width="1.1"/></svg>`
+const ICON_RETURN = `<svg width="12" height="11" viewBox="0 0 12 11" fill="none" aria-hidden="true" style="display:inline-block;vertical-align:middle;margin-right:6px;opacity:.65"><path d="M10 1.5v3a1 1 0 0 1-1 1H2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M5 4 2.5 6.5 5 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+const ICON_MIC   = `<svg width="11" height="13" viewBox="0 0 11 13" fill="none" aria-hidden="true" style="display:inline-block;vertical-align:middle;margin-right:6px;opacity:.65"><rect x="3" y="0.5" width="5" height="7" rx="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 7.5a4.5 4.5 0 0 0 9 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5.5" y1="12" x2="5.5" y2="13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`
+const ICON_LOC   = `<svg width="10" height="12" viewBox="0 0 10 12" fill="none" aria-hidden="true" style="display:inline-block;vertical-align:middle;margin-right:6px;opacity:.65"><path d="M5 .5C2.8.5 1 2.4 1 4.6c0 3.2 4 7.4 4 7.4s4-4.2 4-7.4C9 2.4 7.2.5 5 .5z" stroke="currentColor" stroke-width="1.2"/><circle cx="5" cy="4.6" r="1.4" stroke="currentColor" stroke-width="1.1"/></svg>`
 
 /**
  * Renders the legacy (line-based) walk UI into `container`.
@@ -28,9 +27,9 @@ const ICON_LOC   = `<svg width="10" height="12" viewBox="0 0 10 12" fill="none" 
 export function LegacySessionView(container, { canvasBody, emptySteps, textarea, onLineAdded, voiceLabel }) {
   // Rewrite empty-state steps for legacy mode
   emptySteps.innerHTML = `
-    <p>Type a thought and press return ${ICON_RETURN}</p>
-    <p>or speak it with ${voiceLabel} ${ICON_MIC}</p>
-    <p>Every note saves the time ${ICON_CLOCK} and location ${ICON_LOC} automatically.</p>
+    <p>${ICON_RETURN} Type a thought and press return</p>
+    <p>${ICON_MIC} or speak it with ${voiceLabel}</p>
+    <p>${ICON_LOC} every note saves your location automatically</p>
   `
 
   // ── Para-info sheet ──────────────────────────────────────────────────────── //
