@@ -1,35 +1,45 @@
-# Footnote
+# Foot*note*
 
-A walking journal. Open source, offline-first PWA.
+Built for thinking on foot. Open source, offline-first PWA.
 
 ---
 
-Walking creates a specific kind of thinking — not quite focused, not quite idle — where connections form that won't form at a desk. Most people lose those thoughts before they get home.
+Walking creates a specific kind of thinking. Not desk thinking. The kind where a question that's been sitting for days starts to move. Where the phrase you've been reaching for arrives in the third block, uninvited.
 
-Footnote is built for that window. You open it, you walk, you speak or type. When you get home, your thinking is there — timestamped, GPS-tagged, in a file in your iCloud Drive. Nothing to retrieve. It's just there.
+Most tools aren't built for this. They were designed for someone sitting still, with time to organize and curate. When you're walking, that friction breaks the thread.
+
+Foot*note* has one job. You open it, you walk, you speak or type. Everything goes into one continuous document, saving as you go. When you stop, your walk is there. Timestamped, location-tagged, in a file in your iCloud Drive. Nothing to retrieve. It's just there.
 
 ## Free
 
-- One continuous document per walk, always saving
-- Speak using Siri or type — both feed the same doc
-- No account, nothing stored on a server
-- Works without signal
-- Notes sync to iCloud Drive automatically — no export step
+- One continuous document: everything you've ever thought on a walk, with each walk marked in context. No navigation, no folders, no organization required.
+- Auto-saves everything: every keystroke, every Siri commit, before you put the phone in your pocket.
+- Nothing on a server: no account, nothing leaves your phone. Provably private.
+- iCloud Drive: your document lives in a folder you control, updating after every walk. No export step.
+- GPS and timestamp on each walk, so the thought comes back whole.
+- Screen stays on during dictation. No mid-thought lockouts.
+- Works without signal.
 
 ## Pro — $4.99, one time
 
-- Markdown export
-- Richer walk history
+- Markdown export: clean, portable output of your full document or individual walks
+- Full walk history: jump to any walk directly
+- Walk stats: word count, duration, distance
+- Export any walk as a standalone file
 
-## AI — coming soon
+## AI — coming soon, optional subscription
 
-An optional subscription. Cleans up what Siri gets wrong. On-device, private.
+- Transcript cleanup: fixes what dictation got wrong, on-device, private
+- Walk digest: a brief summary of each walk's key ideas
+- Pattern finder: surfaces the ideas you keep returning to
+- Seed questions: suggests a thread for the next walk based on what you've been circling
+- Cross-walk connections: links a thought today to a related one from weeks ago
 
 ---
 
 No save button. No entry management. No counts, no pace, no gamification.
 
-The app is a PWA. That's intentional — it asks less of your device and more of your attention. A native iOS app is in the works.
+Foot*note* is a PWA. That's intentional. It asks less of your device and more of your attention. A native iOS app is in the works.
 
 ## Quick start
 
@@ -51,11 +61,11 @@ Vanilla JS, Vite, IndexedDB. No framework, no server, no accounts. Hosted on Ver
 
 ## Roadmap
 
-[footnote-tan.vercel.app/roadmap](https://footnote-tan.vercel.app/roadmap) — Phase 0 is shipped. Phase 1 is next.
+[footnote-tan.vercel.app/roadmap](https://footnote-tan.vercel.app/roadmap)
 
 ## Contributing
 
-Open an issue. PRs welcome. The project is opinionated — changes that add counts, scores, or gamification will be declined on principle.
+Open an issue. PRs welcome. The project is opinionated. Changes that add counts, scores, or gamification will be declined on principle.
 
 ## License
 
