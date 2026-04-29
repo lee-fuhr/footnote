@@ -1,5 +1,5 @@
 import { startSession, endSession, getState, getCurrentSessionId } from '../session/manager.js'
-import { appendToBody, flushBody, setBodyTimer } from '../db/index.js'
+import { appendChunk, flushChunk, setChunkTimer, chunkBodyText, getAllSessions } from '../db/index.js'
 import { hasFolder, requestFolder, autoExport } from '../export/icloud.js'
 import { flatCodaSheet } from './FlatCodaSheet.js'
 import { getLineLocation } from '../gps/index.js'
@@ -136,7 +136,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     const sessionId = session.id
 
     // Restore saved content
-    textarea.value = session.body ?? ''
+    textarea.value = chunkBodyText(session.body)
 
     // Rewrite empty-state steps for flat-doc
     emptySteps.innerHTML = '<p>Start typing. Your walk saves as you go.</p>'
@@ -166,9 +166,17 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
       header.prepend(backBtn)
     }
 
-    // Textarea: debounced save on input
+    // Textarea: debounced save on input. At debounce fire, capture the current
+    // GPS + Date.now() and pass them through to appendChunk so each chunk's
+    // metadata reflects the moment it was written.
     function handleInput() {
-      setBodyTimer(setTimeout(() => appendToBody(sessionId, textarea.value), 500))
+      setChunkTimer(setTimeout(() => {
+        const { location, locationStatus } = getLineLocation()
+        appendChunk(sessionId, textarea.value, {
+          timestamp: Date.now(),
+          location: locationStatus === 'live' ? location : null,
+        })
+      }, 500))
     }
 
     // ── Voice recognition (flat-doc only) ──────────────────────────────── //
@@ -189,7 +197,13 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
             textarea.scrollTop + textarea.clientHeight >= textarea.scrollHeight - 40
 
           textarea.value += (textarea.value ? ' ' : '') + text
-          setBodyTimer(setTimeout(() => appendToBody(sessionId, textarea.value), 500))
+          setChunkTimer(setTimeout(() => {
+            const { location, locationStatus } = getLineLocation()
+            appendChunk(sessionId, textarea.value, {
+              timestamp: Date.now(),
+              location: locationStatus === 'live' ? location : null,
+            })
+          }, 500))
 
           if (nearBottom) {
             textarea.scrollTop = textarea.scrollHeight
@@ -231,14 +245,21 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
         _voice = null
       }
 
-      await flushBody(sessionId, textarea.value)
+      const { location: endLoc, locationStatus: endLocStatus } = getLineLocation()
+      await flushChunk(sessionId, textarea.value, {
+        timestamp: Date.now(),
+        location: endLocStatus === 'live' ? endLoc : null,
+      })
       await endSession()
+
+      // Re-read to get the final chunk array for export
+      const stored = (await getAllSessions()).find(s => s.id === sessionId)
 
       // iCloud auto-export — first walk opens the folder picker (walk-end
       // is a user gesture, so showDirectoryPicker is allowed). Subsequent
       // walks write silently. If the user cancels or permission lapses,
       // the walk is still saved locally.
-      const sessionForExport = { ...session, body: textarea.value, endedAt: Date.now() }
+      const sessionForExport = { ...session, body: stored?.body ?? [], endedAt: Date.now() }
       if (!(await hasFolder())) await requestFolder()
       const exportResult = await autoExport(sessionForExport)
 

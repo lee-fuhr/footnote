@@ -4,6 +4,7 @@ import { logger } from '../logger.js'
 let _watchId = null
 let _permissionStatus = 'unknown'
 let _acquiring = false
+let _anchorPollerId = null
 
 let _position = {
   lat: null,
@@ -75,6 +76,31 @@ export function getLineLocation() {
 }
 
 export function getPermissionStatus() { return _permissionStatus }
+
+/**
+ * Starts a 60-second interval that snapshots the current GPS position and
+ * passes it to `callback`. Replaces any existing poller.
+ *
+ * @param callback - called with {lat, lng, accuracy, timestamp}
+ * @param options.intervalMs - polling interval (default 60 000)
+ * @param options.positionFn - override position source (for testing)
+ */
+export function startAnchorPoller(callback, { intervalMs = 60000, positionFn = null } = {}) {
+  if (_anchorPollerId !== null) clearInterval(_anchorPollerId)
+  const getPos = positionFn ?? (() => (_position.capturedAt !== null ? _position : null))
+  _anchorPollerId = setInterval(() => {
+    const pos = getPos()
+    if (!pos) return
+    callback({ lat: pos.lat, lng: pos.lng, accuracy: pos.accuracy, timestamp: Date.now() })
+  }, intervalMs)
+}
+
+export function stopAnchorPoller() {
+  if (_anchorPollerId !== null) {
+    clearInterval(_anchorPollerId)
+    _anchorPollerId = null
+  }
+}
 
 /** Returns CSS dot class: 'gps-acquiring' | 'gps-live' | 'gps-live-low' | 'gps-stale' | 'gps-unavailable' */
 export function getIndicatorClass() {

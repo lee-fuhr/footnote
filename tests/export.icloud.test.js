@@ -8,7 +8,13 @@ const SESSION = {
   id: 'test-session',
   startedAt: new Date('2026-04-28T14:35:00').getTime(),
   endedAt: new Date('2026-04-28T15:10:00').getTime(),
-  body: 'Walked through the park. Thought about the project.',
+  body: [
+    {
+      text: 'Walked through the park. Thought about the project.',
+      timestamp: new Date('2026-04-28T14:35:00').getTime(),
+      location: null,
+    },
+  ],
 }
 
 beforeEach(async () => {

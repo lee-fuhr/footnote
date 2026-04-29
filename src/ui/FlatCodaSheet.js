@@ -1,5 +1,6 @@
 import { markCoded } from '../session/coded.js'
 import { markSessionStarred } from '../session/starred.js'
+import { chunkBodyText } from '../db/index.js'
 
 function FlatCodaSheetEl() {
   const el = document.createElement('div')
@@ -30,7 +31,7 @@ function FlatCodaSheetEl() {
 
   function open(session) {
     _sessionId = session.id
-    bodyEl.textContent = session.body || ''
+    bodyEl.textContent = chunkBodyText(session.body)
     el.classList.add('open')
     el.focus()
   }

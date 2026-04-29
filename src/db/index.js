@@ -210,46 +210,150 @@ export async function storeMeta(key, value) {
   await awaitTx(txn)
 }
 
-// ── Body (flat-doc, v3) ──────────────────────────────────────────────────────
+// ── Body (chunk array, v4) ───────────────────────────────────────────────────
 
-// Module-level debounce timer shared with keyboard input handler.
-// flushBody() cancels this timer before issuing an immediate write.
-let _bodyDebounceTimer = null
+// Two-minute window — pauses under this extend the last chunk; pauses at or
+// over create a new chunk. Locked decision (decisions.md, Q1).
+export const CHUNK_GAP_MS = 120 * 1000
 
 /**
- * Full replace of sessions.body with fullText and updates bodyUpdatedAt.
- * Silent no-op if the session does not exist (handles in-flight debounce timers
- * that fire after a session has already been deleted — matches the pattern used
- * by closeSession and appendLine).
+ * Flatten chunk array to the text the user sees in the textarea.
+ * Returns '' for null/undefined/empty bodies.
  */
-export async function appendToBody(sessionId, fullText) {
+export function chunkBodyText(body) {
+  if (Array.isArray(body)) return body.map(c => c.text).join('')
+  return ''
+}
+
+let _chunkDebounceTimer = null
+
+/**
+ * Initialise a fresh walk session: body = [] (empty array of chunks).
+ * Distinguishes a walk-mode session (array body) from a legacy line session
+ * (null body). Silent no-op if the session does not exist.
+ */
+export async function initChunkBody(sessionId) {
   const txn = tx(['sessions'], 'readwrite')
   const session = await get('sessions', sessionId, txn)
   if (!session) return
-  session.body = fullText
+  session.body = []
   session.bodyUpdatedAt = Date.now()
   await put('sessions', session, txn)
   await awaitTx(txn)
 }
 
 /**
- * Lets external callers (e.g. Editor.js) register the active debounce timer id
- * so that flushBody() can cancel it even when it was scheduled outside this module.
+ * Append-or-extend a chunk for sessionId given the current full textarea
+ * value. Pauses under CHUNK_GAP_MS extend the last chunk; pauses ≥ that gap
+ * seal it and start a new one. Silent no-op for a missing session.
+ *
+ * Sealed chunks are normally frozen, but if the user deletes back past a
+ * seal, sealed chunks are popped from the tail until the textarea content is
+ * a prefix-match again. This keeps concat(chunks.text) === fullText.
  */
-export function setBodyTimer(id) {
-  _bodyDebounceTimer = id
+export async function appendChunk(sessionId, fullText, { timestamp, location }) {
+  const txn = tx(['sessions'], 'readwrite')
+  const session = await get('sessions', sessionId, txn)
+  if (!session) return
+
+  let body = Array.isArray(session.body) ? [...session.body] : []
+
+  const lastChunk = body[body.length - 1]
+  const startNewChunk =
+    !lastChunk || timestamp - lastChunk.timestamp >= CHUNK_GAP_MS
+
+  // Pop sealed chunks if the user has deleted past their seal. If a new
+  // chunk is starting, every existing chunk is treated as sealed; otherwise
+  // only the chunks before the last one are sealed.
+  const sealedSliceEnd = () => (startNewChunk ? body.length : body.length - 1)
+  while (body.length > 0) {
+    const sealedText = body.slice(0, sealedSliceEnd()).map(c => c.text).join('')
+    if (fullText.startsWith(sealedText)) break
+    // drop the most recent sealed chunk (always at position sealedSliceEnd()-1)
+    const idx = sealedSliceEnd() - 1
+    body = [...body.slice(0, idx), ...body.slice(idx + 1)]
+  }
+
+  const sealedText = body.slice(0, sealedSliceEnd()).map(c => c.text).join('')
+  const newChunkText = fullText.startsWith(sealedText)
+    ? fullText.slice(sealedText.length)
+    : fullText
+
+  if (startNewChunk) {
+    body = [...body, { text: newChunkText, timestamp, location }]
+  } else {
+    body = [...body.slice(0, -1), { text: newChunkText, timestamp, location }]
+  }
+
+  session.body = body
+  session.bodyUpdatedAt = timestamp
+  await put('sessions', session, txn)
+  await awaitTx(txn)
 }
 
 /**
- * Cancels any pending debounce timer and issues an immediate IDB write.
- * Returns a Promise that resolves ONLY after the IDB write commits.
- * Callers must await this before calling closeSession() to prevent last-words
- * data loss.
+ * Register the active debounce timer id so flushChunk() can cancel it.
+ * Cancels any prior pending timer before storing the new id — without this,
+ * rapid input or simultaneous keyboard + voice events would stack timers
+ * and fire multiple appendChunk calls per keystroke.
  */
-export async function flushBody(sessionId, currentValue) {
-  if (_bodyDebounceTimer !== null) {
-    clearTimeout(_bodyDebounceTimer)
-    _bodyDebounceTimer = null
+export function setChunkTimer(id) {
+  if (_chunkDebounceTimer !== null) clearTimeout(_chunkDebounceTimer)
+  _chunkDebounceTimer = id
+}
+
+// ── Location anchors ─────────────────────────────────────────────────────────
+
+/**
+ * Append a GPS anchor {lat, lng, accuracy, timestamp} to the session record.
+ * Initializes locationAnchors array if the field is absent (no migration needed).
+ * Silent no-op for a missing session.
+ */
+export async function appendLocationAnchor(sessionId, anchor) {
+  const txn = tx(['sessions'], 'readwrite')
+  const session = await get('sessions', sessionId, txn)
+  if (!session) return
+  const anchors = Array.isArray(session.locationAnchors) ? [...session.locationAnchors] : []
+  anchors.push(anchor)
+  session.locationAnchors = anchors
+  await put('sessions', session, txn)
+  await awaitTx(txn)
+}
+
+/** Returns the location anchor array for a session, or [] if none exist. */
+export async function getLocationAnchors(sessionId) {
+  const txn = tx(['sessions'], 'readonly')
+  const session = await get('sessions', sessionId, txn)
+  return Array.isArray(session?.locationAnchors) ? session.locationAnchors : []
+}
+
+/**
+ * Returns the anchor nearest to `timestamp` from an array, or null if empty.
+ * On tie, the earlier anchor wins (lower index).
+ */
+export function interpolateLocation(timestamp, anchors) {
+  if (!anchors || anchors.length === 0) return null
+  let nearest = anchors[0]
+  let minDiff = Math.abs(timestamp - anchors[0].timestamp)
+  for (let i = 1; i < anchors.length; i++) {
+    const diff = Math.abs(timestamp - anchors[i].timestamp)
+    if (diff < minDiff) { minDiff = diff; nearest = anchors[i] }
   }
-  await appendToBody(sessionId, currentValue)
+  return nearest
+}
+
+/**
+ * Cancel any pending chunk-debounce timer and issue an immediate write.
+ * Resolves only after the IDB write commits — callers must await before
+ * closeSession() to avoid last-words data loss.
+ */
+export async function flushChunk(sessionId, fullText, { timestamp, location } = {}) {
+  if (_chunkDebounceTimer !== null) {
+    clearTimeout(_chunkDebounceTimer)
+    _chunkDebounceTimer = null
+  }
+  await appendChunk(sessionId, fullText, {
+    timestamp: timestamp ?? Date.now(),
+    location: location ?? null,
+  })
 }

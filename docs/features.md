@@ -16,6 +16,7 @@
 | Richer session history | — | ✓ | ✓ |
 | Voice transcription | — | — | ✓ |
 | AI transcript cleanup | — | — | ✓ |
+| Semantic chunking at export | — | — | ✓ |
 | **Price** | Always free | $4.99 launch / $7.99 regular (one-time) | ~$3/mo (waitlist) |
 | **Trial** | — | 3 months free | — |
 

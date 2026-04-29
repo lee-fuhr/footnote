@@ -1,11 +1,11 @@
 /**
- * M3 Walk UI tests — flat-doc path
+ * M3 Walk UI tests — chunk-doc path (v4)
  *
  * These tests run in the node environment (no DOM) and exercise the
- * module-level contracts that M3 depends on. DOM-dependent behaviour
- * (textarea input, end-button click) is verified via manual UX convergence
- * gate rather than automated DOM tests because the project vitest config
- * uses environment: 'node' and carries no DOM library.
+ * module-level contracts that the walk path depends on. DOM-dependent
+ * behaviour (textarea input, end-button click) is verified via manual UX
+ * convergence gate rather than automated DOM tests because the project
+ * vitest config uses environment: 'node' and carries no DOM library.
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
@@ -14,9 +14,10 @@ import {
   openDB,
   openSession,
   getAllSessions,
-  appendToBody,
-  setBodyTimer,
-  flushBody,
+  initChunkBody,
+  appendChunk,
+  setChunkTimer,
+  flushChunk,
 } from '../src/db/index.js'
 
 // ── localStorage shim (mirrors setup.js, re-applied here for clarity) ───────
@@ -38,134 +39,132 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
-// ─── Test 1: new walk session initialises with body: '' ─────────────────────
+// ─── Test 1: new walk session initialises with body: [] ─────────────────────
 
-describe('startSession — flat-doc init', () => {
-  it('new walk session initialises with body empty string, not null', async () => {
-    // manager.startSession() calls _doOpen() → appendToBody(id, '')
-    // We test the same sequence here directly since manager imports are
-    // re-entrant and would double-init state. Instead we verify the contract:
-    // openSession() gives body:null; appendToBody(id,'') sets body:''.
+describe('startSession — chunk-doc init', () => {
+  it('new walk session initialises with body as empty array, not null', async () => {
+    // manager.startSession() calls _doOpen() → initChunkBody(id)
+    // We test the same sequence here directly. openSession gives body:null;
+    // initChunkBody(id) sets body: [].
     const session = await openSession()
     expect(session.body).toBeNull()           // raw DB default — still null
 
-    await appendToBody(session.id, '')
+    await initChunkBody(session.id)
     const sessions = await getAllSessions()
     const updated = sessions.find(s => s.id === session.id)
-    expect(updated.body).toBe('')             // '' distinguishes walk from legacy
+    expect(updated.body).toEqual([])           // empty array distinguishes walk from legacy
     expect(updated.body).not.toBeNull()
   })
 })
 
-// ─── Test 2: setBodyTimer / debounce cancel ──────────────────────────────────
+// ─── Test 2: setChunkTimer / debounce cancel ────────────────────────────────
 //
 // Strategy: IDB setup uses real timers (fake-indexeddb Promises break with
 // fake timers). We install fake timers only for the synchronous portion that
 // tests setTimeout/clearTimeout behaviour, then restore real timers before
 // any awaited IDB call.
 
-describe('setBodyTimer + flushBody cancel', () => {
-  it('flushBody cancels the pending debounce set via setBodyTimer', async () => {
-    // IDB setup with real timers
+describe('setChunkTimer + flushChunk cancel', () => {
+  it('flushChunk cancels the pending debounce set via setChunkTimer', async () => {
     const session = await openSession()
-    await appendToBody(session.id, '')
+    await initChunkBody(session.id)
 
     const pendingWrite = vi.fn()
 
-    // Install fake timers — only for the setTimeout/clearTimeout slice
     vi.useFakeTimers()
 
-    // Simulate what the textarea input handler does:
-    // schedule a 500ms debounce, register the timer with setBodyTimer
     const timerId = setTimeout(() => {
       pendingWrite()
     }, 500)
-    setBodyTimer(timerId)
+    setChunkTimer(timerId)
 
-    // Restore real timers before any IDB await
     vi.useRealTimers()
 
-    // flushBody cancels _bodyDebounceTimer via clearTimeout then writes to IDB
-    await flushBody(session.id, 'final value at flush time')
+    await flushChunk(session.id, 'final value at flush time', {
+      timestamp: 1000,
+      location: null,
+    })
 
-    // The callback should NOT have fired (fake timer was never advanced —
-    // but the key assertion is that clearTimeout was called by flushBody)
     expect(pendingWrite).not.toHaveBeenCalled()
 
-    // And the final flush value must be persisted
     const sessions = await getAllSessions()
     const stored = sessions.find(s => s.id === session.id)
-    expect(stored.body).toBe('final value at flush time')
+    expect(stored.body).toHaveLength(1)
+    expect(stored.body[0].text).toBe('final value at flush time')
   })
 
-  it('setBodyTimer registers the timer id consumed by flushBody', async () => {
-    // Verify that setBodyTimer correctly updates _bodyDebounceTimer by testing
-    // the full cancel+write sequence without fake timers.
-    // This is the interface contract: setBodyTimer(id) + flushBody() = cancel + immediate write.
+  it('setChunkTimer registers the timer id consumed by flushChunk', async () => {
     const session = await openSession()
 
     let timerFired = false
-    // Schedule a real timer with a long delay so it never fires during this test
     const id = setTimeout(() => { timerFired = true }, 10000)
-    setBodyTimer(id)
+    setChunkTimer(id)
 
-    // flushBody must cancel that timer and write immediately
-    await flushBody(session.id, 'registered write')
+    await flushChunk(session.id, 'registered write', {
+      timestamp: 1000,
+      location: null,
+    })
 
-    // Give real event loop a cycle to confirm the timer doesn't fire
     await new Promise(r => setTimeout(r, 10))
     expect(timerFired).toBe(false)
 
     const sessions = await getAllSessions()
-    expect(sessions.find(s => s.id === session.id).body).toBe('registered write')
+    const stored = sessions.find(s => s.id === session.id)
+    expect(stored.body).toHaveLength(1)
+    expect(stored.body[0].text).toBe('registered write')
   })
 })
 
-// ─── Test 3: flat-doc session skips CodaSheet (body !== null check) ──────────
+// ─── Test 3: walk-mode (array) vs legacy (null) routing ─────────────────────
 
-describe('flat-doc vs legacy branch decision', () => {
-  it('session with body === empty string is a flat-doc session', async () => {
+describe('walk-mode vs legacy branch decision', () => {
+  it('session with body as array is a walk-mode session', async () => {
     const session = await openSession()
-    await appendToBody(session.id, '')
+    await initChunkBody(session.id)
     const sessions = await getAllSessions()
     const s = sessions.find(x => x.id === session.id)
-    // flat-doc: body !== null → skip CodaSheet
     expect(s.body).not.toBeNull()
-    expect(typeof s.body).toBe('string')
+    expect(Array.isArray(s.body)).toBe(true)
   })
 
   it('session with body === null is a legacy session', async () => {
     const session = await openSession()
-    // No appendToBody call — stays null (legacy)
+    // No initChunkBody call — stays null (legacy)
     const sessions = await getAllSessions()
     const s = sessions.find(x => x.id === session.id)
     expect(s.body).toBeNull()
   })
 })
 
-// ─── Test 4: .md export of flat-doc session returns body content ─────────────
+// ─── Test 4: .md export of walk-mode session returns chunk content ──────────
 
 import { sessionToMarkdown } from '../src/export/markdown.js'
 
-describe('sessionToMarkdown — flat-doc path', () => {
-  it('returns body content as single block when session.body is a non-empty string', () => {
+describe('sessionToMarkdown — chunk-doc path', () => {
+  it('returns chunk text in the exported markdown when body is a chunk array', () => {
     const session = {
-      id: 'sess-flat',
+      id: 'sess-walk',
       startedAt: new Date('2026-04-28T10:00:00Z').getTime(),
       endedAt: new Date('2026-04-28T10:45:00Z').getTime(),
-      body: 'This is the walk. It captured a lot. Final thought here.',
+      body: [
+        {
+          text: 'This is the walk. It captured a lot. Final thought here.',
+          timestamp: new Date('2026-04-28T10:00:00Z').getTime(),
+          location: null,
+        },
+      ],
     }
     const md = sessionToMarkdown(session, [])
     expect(md).toContain('This is the walk. It captured a lot. Final thought here.')
     expect(md).not.toBe('')
   })
 
-  it('returns non-empty markdown even when body is empty string', () => {
+  it('returns non-empty markdown even when body is empty array', () => {
     const session = {
-      id: 'sess-empty-flat',
+      id: 'sess-empty-walk',
       startedAt: new Date('2026-04-28T10:00:00Z').getTime(),
       endedAt: null,
-      body: '',
+      body: [],
     }
     const md = sessionToMarkdown(session, [])
     expect(typeof md).toBe('string')
@@ -202,31 +201,26 @@ describe('session resume includes body field', () => {
     _resetForTesting()
   })
 
-  it('startSession returns session with body populated after walk init', async () => {
+  it('startSession returns session with body populated as empty array after walk init', async () => {
     const session = await startSession()
-    // startSession calls _doOpen which calls appendToBody(id, '')
     expect(session).toHaveProperty('body')
-    expect(session.body).toBe('')
+    expect(session.body).toEqual([])
   })
 
   it('initSession resume returns full session record including body field', async () => {
-    // Create a walk session (sets body:'')
     const session = await startSession()
     const sessionId = session.id
 
-    // Simulate app going to background: write heartbeat, then reset state
     localStorage.setItem('session_heartbeat', JSON.stringify({
       sessionId,
-      ts: Date.now() - 5 * 60 * 1000, // 5 min ago — within gap
+      ts: Date.now() - 5 * 60 * 1000,
     }))
     _resetForTesting()
 
-    // App reopens — initSession resumes
     const resumed = await initSession()
     expect(resumed).toBeTruthy()
     expect(resumed.id).toBe(sessionId)
-    // Must include body field so Editor can route flat-doc vs legacy
     expect(resumed).toHaveProperty('body')
-    expect(resumed.body).toBe('')
+    expect(Array.isArray(resumed.body)).toBe(true)
   })
 })

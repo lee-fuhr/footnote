@@ -1,6 +1,7 @@
 import { transition, IDLE, ACTIVE, CLOSING } from './state.js'
 import { shouldStartNewSession } from './gap.js'
-import { openSession, closeSession, appendLine, getLastActiveSessionId, appendToBody, getAllSessions } from '../db/index.js'
+import { openSession, closeSession, appendLine, getLastActiveSessionId, initChunkBody, getAllSessions, appendLocationAnchor } from '../db/index.js'
+import { startAnchorPoller, stopAnchorPoller } from '../gps/index.js'
 import { logger } from '../logger.js'
 
 let _state = IDLE
@@ -80,6 +81,7 @@ export async function initSession(onNewSession) {
         _state = ACTIVE
         writeHeartbeat()
         startInactivityTimer()
+        startAnchorPoller(anchor => appendLocationAnchor(_currentSessionId, anchor))
         logger.info('session', 'resumed', { sessionId })
         // Return full session record so Editor can read session.body for routing
         const sessions = await getAllSessions()
@@ -99,6 +101,7 @@ export async function initSession(onNewSession) {
     _state = ACTIVE
     writeHeartbeat()
     startInactivityTimer()
+    startAnchorPoller(anchor => appendLocationAnchor(_currentSessionId, anchor))
     // Return full session record so Editor can read session.body for routing
     const sessions = await getAllSessions()
     const session = sessions.find(s => s.id === activeId)
@@ -111,15 +114,16 @@ export async function initSession(onNewSession) {
 async function _doOpen() {
   const result = transition(IDLE, 'openSession')
   const session = await openSession()
-  // Init flat-doc body immediately — distinguishes walk sessions (body:'') from
-  // legacy sessions (body: null). openSession() keeps body:null as its default
-  // so the schema test stays green; we set '' here at the walk-start layer.
-  await appendToBody(session.id, '')
-  session.body = ''
+  // Init chunk body immediately — distinguishes walk sessions (body: []) from
+  // legacy sessions (body: null). openSession keeps body: null as the default
+  // so the schema test stays green; we move it to [] here at walk-start.
+  await initChunkBody(session.id)
+  session.body = []
   _currentSessionId = session.id
   _state = result.state
   _lastLineTs = Date.now()
   applyEffects(result.effects, session)
+  startAnchorPoller(anchor => appendLocationAnchor(_currentSessionId, anchor))
   logger.info('session', 'opened', { sessionId: session.id })
   return session
 }
@@ -136,6 +140,7 @@ export async function startSession() {
 
 export async function endSession() {
   if (_state !== ACTIVE) return
+  stopAnchorPoller()
   const result = transition(_state, 'closeSession')
   await closeSession(_currentSessionId)
   applyEffects(result.effects)

@@ -1,4 +1,5 @@
 import { getLocationStatus } from '../gps/staleness.js'
+import { CHUNK_GAP_MS, interpolateLocation } from '../db/index.js'
 
 function formatDate(epochMs) {
   return new Date(epochMs).toLocaleDateString('en-US', {
@@ -29,6 +30,34 @@ function renderLocation(line) {
   return `📍 ${Math.abs(lat).toFixed(4)}°${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lng).toFixed(4)}°${lng >= 0 ? 'E' : 'W'} _(accuracy: ${accuracy}m)_`
 }
 
+function formatChunkHeader(chunk, anchors) {
+  const time = formatTime(chunk.timestamp)
+  const loc = chunk.location ?? interpolateLocation(chunk.timestamp, anchors)
+  if (!loc) return `*${time}*`
+  const { lat } = loc
+  return `*${time} · ${Math.abs(lat).toFixed(3)}°${lat >= 0 ? 'N' : 'S'}*`
+}
+
+function renderChunks(chunks, anchors = []) {
+  if (chunks.length === 0) return []
+  const blocks = []
+  let current = { header: formatChunkHeader(chunks[0], anchors), text: chunks[0].text }
+  for (let i = 1; i < chunks.length; i++) {
+    const prev = chunks[i - 1]
+    const chunk = chunks[i]
+    const gap = chunk.timestamp - prev.timestamp
+    const hasLoc = chunk.location ?? interpolateLocation(chunk.timestamp, anchors)
+    if (gap >= CHUNK_GAP_MS || hasLoc) {
+      blocks.push(`${current.header}\n\n${current.text}`)
+      current = { header: formatChunkHeader(chunk, anchors), text: chunk.text }
+    } else {
+      current.text += chunk.text
+    }
+  }
+  blocks.push(`${current.header}\n\n${current.text}`)
+  return blocks
+}
+
 /** Pure function — converts a session + its lines to Markdown string. */
 export function sessionToMarkdown(session, lines) {
   const date = formatDate(session.startedAt)
@@ -44,10 +73,11 @@ export function sessionToMarkdown(session, lines) {
     '---',
   ]
 
-  // Flat-doc sessions: body is the single text block; skip per-line mapping
+  // Walk-mode: body is array of chunks → render with timestamp/location headers
+  // Legacy: body is null → fall through to lines store
   let body
-  if (session.body !== null && session.body !== undefined) {
-    body = session.body ? [session.body] : []
+  if (Array.isArray(session.body)) {
+    body = renderChunks(session.body, session.locationAnchors ?? [])
   } else {
     body = lines.map(line => [
       `**${formatTime(line.createdAt)}** · ${renderLocation(line)}`,
