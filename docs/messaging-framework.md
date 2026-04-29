@@ -1,6 +1,6 @@
 # Messaging framework
 
-Version 1.2.0 | 2026-04-29
+Version 1.3.0 | 2026-04-29
 
 ---
 
@@ -18,7 +18,7 @@ This messaging makes one promise: **your thinking survives the walk.**
 
 # My A+ customer
 
-People whose best thinking happens while they move. Likely introverts. Quiet types. Ruminators. Readers, writers, builders. People who fill notebooks and forget where they put them. They:
+People whose best thinking happens while they move. The kind who take the long way when they have something to work out. Who know better than to rush it. Readers, writers, builders. People who fill notebooks and forget where they put them. They:
 
 - **The thinker on foot:** walks not for steps but for clarity. The long way home, the morning loop, the 20 minutes between meetings. The walk is where the knot unties itself.
 - Know their best sessions are the ones they didn't plan. A question settles, a structure reveals itself, a phrase arrives.
@@ -54,7 +54,7 @@ Foot*note* has one job. You open it, you walk, you speak or type. Everything goe
 Alternatives:
 - Walk into your best thinking. Come back with it.
 - Your thinking, wherever you walk.
-- Come back from every walk with your thinking intact.
+- Come back from every walk with your thinking.
 - Built for thinking on foot. *(tagline, not value prop; keep for headlines)*
 
 ## Benefits
@@ -78,13 +78,13 @@ Alternatives:
 
 **Pro ($4.99, one time):**
 - Markdown export: clean, portable output of your full document or individual walks
-- Full walk history with demarcated navigation: jump to any walk directly
+- Full walk history: jump to any walk directly
 - Walk stats: word count, duration, distance per walk
 - Export any walk as a standalone file
 
 **AI (coming soon, optional subscription):**
-- Transcript cleanup: fixes what Siri got wrong, on-device, private
-- Walk digest: a clean one-paragraph summary of each walk
+- Transcript cleanup: fixes what dictation got wrong, on-device, private
+- Walk digest: a brief summary of each walk's key ideas
 - Pattern finder: surfaces ideas you keep returning to across walks
 - Seed questions: suggests a thread for the next walk based on what you've been circling
 - Cross-walk connections: links a thought today to a related one from weeks ago
@@ -113,6 +113,7 @@ Alternatives:
 - Warm, not clinical. Closer to an independent bookshop than a productivity app.
 - Honest. No hype, no "revolutionary." State what's true. Let the product make the case.
 - Speak to the thinker, not the note-taker. The customer's identity is "person who thinks while walking," not "person who needs a notes app."
+- Assume the reader already knows what they're rejecting. Don't explain why the alternatives are bad. The right person already knows.
 
 ---
 
@@ -224,4 +225,4 @@ Start by testing whether the A+ customer still holds: are the people who love Fo
 
 # Bring it to life
 
-Foot*note* isn't competing on features. It's competing on understanding. The people it's for have already tried the alternatives and found them wanting. Not because the alternatives are bad, but because they were built for a different mode of thinking. The job is to make those people feel seen in every word, from the first screen they open to the App Store listing, so they know immediately: this one was built for this.
+Foot*note* isn't competing on features. It's competing on recognition. The people it's for have already tried everything else and found it wanting. Not because it was bad, but because it was built for a different mode of thinking. The job is to make them feel, from the first word they read, that this one was built for this.
