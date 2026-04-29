@@ -71,7 +71,7 @@ Alternatives:
 - One continuous document: everything you've ever spoken or typed on a walk, with walk demarcations. No navigation, no folders, no organization required.
 - Auto-saves everything: every keystroke, every Siri commit, before you put the phone in your pocket.
 - Nothing on a server: no account, nothing leaves your phone, provably private.
-- iCloud Drive: your document lives in a folder you control, updating after every walk. No export step.
+- iCloud sync: your document lives in a folder you control, updating after every walk. No export step.
 - GPS and timestamp per walk: each demarcation carries when and where, so the thought comes back whole.
 - Screen stays on: no mid-dictation lockouts.
 - Works without signal.
@@ -163,7 +163,7 @@ Lead with the problem, not the sender. Subject lines name the situation, not the
 |-----|-------|-----|
 | Walk | Session, activity, exercise | The user's frame is "going for a walk," not a workout |
 | Thinking, thoughts | Content, entries, logs | Human language, not system-speak |
-| iCloud Drive | Cloud, sync, backup | Specific and concrete, not a category name |
+| iCloud sync | Cloud, backup, integration | The mechanism, not the category. "Integration" overclaims; sync is what it is. Use "iCloud Drive" only when naming the literal location. |
 | Siri | Voice dictation, STT, speech recognition | What the user already calls it |
 | Document | Journal | "Journal" puts us in Day One territory |
 | Walk demarcation | Per-walk document, session | The doc is continuous. Walks are marked within it, not separate. |
