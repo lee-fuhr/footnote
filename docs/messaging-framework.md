@@ -1,45 +1,45 @@
 # Messaging framework
 
-Version 1.0.0 | 2026-04-29
+Version 1.1.0 | 2026-04-29
 
 ---
 
 # Why this framework matters
 
-Footnote exists for a specific kind of person in a specific kind of moment: the walk home, the morning run, the 20 minutes between meetings when something clicks that won't click at a desk. The product has one job — capture that thinking before it disappears. This framework ensures every word Footnote publishes reinforces that single truth, from the App Store listing to a social post.
+Foot*note* exists for one specific moment: the generative flow state that walking creates. Aristotle's students, Darwin's thinking path, Jobs's famous walks — walking has always been where real thinking happens. The difference from Bear or iA Writer, which go deep on helping writers get into flow at a desk, is that the flow state here isn't induced by the tool — it's induced by the walk itself. The tool's only job is to not break it.
 
-At the core is the A+ customer: someone who already has good ideas. They walk to think, not for fitness. They've filled notebooks and lost them. They know their best thinking happens somewhere else. Everything written for Footnote is written for them.
+At the core is the A+ customer: someone who already has good ideas. They know their best thinking happens while they're moving. Everything written for Foot*note* is written for them — and written to keep them in the state that produces the thinking in the first place.
 
-This framework applies Emma Stratton's "Make It Punchy" methodology: VBF sequencing (value before benefits before features), the customer as the hero, an external villain, and benefits mapped to obstacles. One Footnote-specific rule: simplicity must be shown, not claimed. Every piece of copy should demonstrate what it describes.
+This framework applies Emma Stratton's "Make It Punchy" methodology: VBF sequencing (value before benefits before features), the customer as the hero, an external villain, and benefits mapped to obstacles. One Foot*note*-specific rule: simplicity must be shown, not claimed. Every piece of copy demonstrates what it describes.
 
-This messaging makes one promise: **your walk-home thoughts are there when you need them.**
+This messaging makes one promise: **your thinking survives the walk.**
 
 ---
 
 # My A+ customer
 
-People whose best thinking happens while they move. They're readers, writers, builders, people who fill notebooks and forget where they put them. They:
+People whose best thinking happens while they move. Likely introverts. Quiet types. Ruminators. Readers, writers, builders — people who fill notebooks and forget where they put them. They:
 
 - **The thinker on foot** — walks not for steps but for clarity. The long way home, the morning loop, the 20 minutes between meetings. The walk is where the knot unties itself.
 - Know their best sessions are the ones they didn't plan. A question settles, a structure reveals itself, a phrase arrives.
-- Have tried voice memos and given up. The pile is unsearchable, the transcription is garbled, the context is gone.
+- Have tried voice memos and abandoned them. The pile is unsearchable, the transcription is garbled, and hitting record broke the thought before it finished forming.
 - Use Notes or a similar app but feel the friction every time they have to create a new note, name it, decide where it goes.
-- Lose the walk-home thoughts. Not because they stopped thinking, but because nothing was ready for them when it happened.
+- Come back from walks empty-handed — not because they stopped thinking, but because nothing was in place when the thinking happened.
 - Are not looking for another productivity tool. They want something closer to an external mind: a place to think to, not a system to maintain.
 
-They don't want a record-keeping system. They want to walk home and have their thinking be there.
+They don't want to manage a record of their thinking. They want to think — and have the thinking be there.
 
 ---
 
 # My story
 
-Walking creates a specific kind of thinking. Aristotle taught walking. Darwin had a thinking path. Jobs was famous for it. The cognitive science now backs what every walker already knows: movement loosens the mind, and the loosened mind makes connections the seated one won't.
+Walking creates a specific kind of thinking. The bilateral stimulation of alternating left-right movement activates both brain hemispheres — the same mechanism underlying EMDR therapy for processing stuck thoughts. Aristotle taught while walking. Darwin had a dedicated thinking path. Jobs was famous for it. Movement doesn't just loosen the mind; it opens channels that sitting still closes.
 
-But the tools designed to capture those thoughts were designed for sitting still. A voice memo requires you to hit record and remember to name it later. A notes app asks you to create a note before you can type. And even when you do capture something, the walk itself disappears: when you had the idea, where you were standing, how long you'd been out. The context that makes the thought legible is gone the moment you get home.
+But the tools built to capture that thinking were designed for someone sitting still — and not just sitting, but deliberately devoting time to curating, enriching, and doing something with their notes. A voice memo requires you to hit record and deal with the pile later. A notes app asks you to create and name something before you can say anything. Even apps built specifically for flow, like Bear or iA Writer, are designed for the desk flow state, not the walking one. When the walking mind has to pause and manage a tool, the generative thread breaks.
 
-You want to walk home and have it all be there. Not a list of voice memos to sort through, not a half-finished note to decipher. The thought, in the order you had it, with the time and place attached, in plain text you can read or search or share. An instrument built for thinking on foot, not a tool borrowed from the desk.
+You want to walk — and then have it be there. Not a pile to sort through, not a half-finished note to decipher. The thought, in the order it came, readable. An instrument built for thinking on foot, not borrowed from a different context.
 
-Footnote has one job. You open it, you walk, you speak or type, you walk home. Everything goes into one document, auto-saving as you go. When you get home, your walk is in iCloud Drive, timestamped, GPS-tagged, readable. Nothing to retrieve. It's just there.
+Foot*note* has one job. You open it, you walk, you speak or type. Everything goes into one continuous document, auto-saving as you go. When you stop, your walk is marked in context, in iCloud Drive, readable. Nothing to retrieve. It's just there. And as Foot*note* grows, so will the ways it helps you do something with what the walk produces.
 
 ---
 
@@ -47,27 +47,46 @@ Footnote has one job. You open it, you walk, you speak or type, you walk home. E
 
 ## Value proposition
 
-> ## Walk home. Your thinking is there.
+[Decision needed: "Walk home" is too literal — Lee walks loops. Candidates below. "Built for thinking on foot." is the current leader.]
+
+> ## Built for thinking on foot.
+
+Alternatives:
+- For people who think on their feet.
+- Think while you walk. Find it when you stop.
+- Walk into your best thinking. Come back with it.
+- Your thinking, wherever you walk.
+- Walk. Think. Have it.
 
 ## Benefits
 
-**It's always there:** No save button, no export step, no "did I remember to...". Every word you said or typed goes into iCloud Drive automatically. The note exists before you get home.
+[Direction: one word + a few words of texture. Working candidates — subject to Lee's call.]
 
-**The walk is the context:** Every note carries when you had it, where you were standing, how long you'd been out. You don't have to remember — it's attached. Six months later, you'll know the difference between the Tuesday morning insight and the Friday afternoon one.
+**Flow:** Walking puts you in it. Foot*note* keeps you there. No save button, no tap-to-start, no decision mid-thought. The only job is to keep thinking.
 
-**One instrument, one job:** Open it, walk, speak or type, walk home. Nothing else to configure, no decision mid-walk about where this thought goes. One document per walk, always.
+**Context:** Every thought comes back with where and when you had it — not metadata you dig for, but the mark on the page. Six months later, you'll know the difference between the Tuesday morning insight and the Friday afternoon one.
+
+**Focus:** One document. Everything in it. Nothing to navigate, nothing to organize. Open, walk, stop. It's there.
 
 ## Features
 
-- Flat-doc per walk: one continuous document per session, auto-saves every keystroke
-- Speak using Siri or type: both feed the same doc, no switching
-- iCloud Drive sync: notes land in a folder you control, automatically, no export step
-- GPS + timestamp: every walk tagged with location, date, duration
-- Offline-first: works without signal, syncs when you're back
-- Screen stays on: wakelock prevents mid-dictation lock
-- No account required: nothing on a server, nothing to sign up for
-- Pro: Markdown export, richer walk history ($4.99, one time)
-- AI tier (coming soon): cleans up what Siri gets wrong, on-device
+**Core (free):**
+- One continuous document: everything you've ever spoken or typed on a walk, with walk demarcations — no navigation, no folders, no organization required
+- Auto-saves everything: every keystroke, every Siri commit, before you put the phone in your pocket
+- Nothing on a server: no account, nothing leaves your phone — provably private
+- iCloud Drive: your document lives in a folder you control, updating after every walk, no export step
+- GPS + timestamp per walk: each demarcation carries when and where, so the thought comes back whole
+- Screen stays on: no mid-dictation lockouts
+- Works without signal
+
+**Pro — $4.99, one time:**
+- Markdown export: clean, portable output of your full document or individual walks
+- Richer walk history and demarcated view
+- [More Pro features TBD]
+
+**AI — coming soon, optional subscription:**
+- Transcript cleanup: fixes what Siri got wrong, on-device, private
+- [Other AI features TBD — patterns, synthesis, prompts]
 
 ---
 
@@ -82,6 +101,7 @@ Footnote has one job. You open it, you walk, you speak or type, you walk home. E
 - No throat-clearing. The first sentence is always the real sentence.
 - Never claim simplicity. Show it. If the copy is simple, it doesn't need to say "simple."
 - Cut 20% from first drafts. If a word doesn't earn its place, remove it.
+- Italicize *note* in Foot*note* wherever typography allows.
 
 ## Tone
 
@@ -89,7 +109,7 @@ Footnote has one job. You open it, you walk, you speak or type, you walk home. E
 - Precise. Every word earns its place. No filler, no hedging.
 - Warm, not clinical. Closer to an independent bookshop than a productivity app.
 - Honest. No hype, no "revolutionary." State what's true. Let the product make the case.
-- Speak to the thinker, not the note-taker. The customer's identity is "person who thinks on walks," not "person who needs a notes app."
+- Speak to the thinker, not the note-taker. The customer's identity is "person who thinks while walking," not "person who needs a notes app."
 
 ---
 
@@ -97,11 +117,11 @@ Footnote has one job. You open it, you walk, you speak or type, you walk home. E
 
 ## Website and App Store
 
-The hero line leads with the walking-creates-thinking premise, not the product. Benefits come before the feature list. No feature grid. The positioning is "this is for people like you," not "here's what it does." App Store screenshots show the walk, not the settings.
+The hero line leads with the walking-creates-thinking premise, not the product. Benefits come before the feature list. No feature grid. The positioning is "this is for people like you," not "here's what it does." App Store screenshots show the walk experience, not the settings. Never use "journal" — it puts Foot*note* in the Day One / bullet journal category, which is the wrong frame.
 
 ## Social
 
-Problem-first content performs. Short observations about walking and thinking outperform product announcements. Formats: insight posts (what I've noticed about walk-home thinking), story posts (a specific walk, what happened), question posts (where does your best thinking happen?). No feature updates as posts. No "excited to announce."
+Problem-first content performs. Short observations about walking and thinking outperform product announcements. Formats: insight posts (what I've noticed about thinking while walking), story posts (a specific walk, what happened), question posts (where does your best thinking happen?). No feature announcements as posts. No "excited to share."
 
 ## Email
 
@@ -109,8 +129,8 @@ Lead with the problem, not the sender. Subject lines name the situation, not the
 
 ## Success metrics
 
-- App Store conversion: people who search "walking notes" or "walk journal" download on first impression
-- Day 7 retention: people who complete a walk in the first week return for a second
+- App Store conversion: people who search "walking notes" or "thinking app" download on first impression
+- Day 7 retention: people who walk in the first week return for a second
 - iCloud sync adoption: share of users who connect a folder in the first session
 - Word of mouth: installs from direct links (auditable via review language and "how did you hear about it")
 
@@ -119,14 +139,16 @@ Lead with the problem, not the sender. Subject lines name the situation, not the
 # What not to do
 
 - Never use "productivity." Wrong frame. This is about thinking and reflection, not output.
-- Never use "seamless." Meaningless filler. Show the seamlessness, don't name it.
-- Never use "on the go." Positions Footnote as an afterthought, not a primary tool.
-- Never use "AI-powered" as a lead. Lead with the human outcome (clean, usable transcript), not the mechanism.
-- Never say "simple" without showing it. The claim is the opposite of the proof.
+- Never use "journal." Puts Foot*note* in the Day One / bullet journal category — wrong frame, wrong competition.
+- Never use "seamless." Meaningless filler. Show it, don't name it.
+- Never use "on the go." Positions Foot*note* as an afterthought, not a primary tool.
+- Never use "AI-powered" as a lead. Lead with the human outcome (clean, usable thoughts), not the mechanism.
+- Never say "simple" without showing it. The claim undermines the proof.
 - Never open with the app. Open with the walk, the thinking, the moment. The app is how, not why.
 - Never list features before benefits. The feature grid kills the premise before it lands.
 - Never use "mindfulness" or "wellness." Wrong audience, wrong frame.
 - Never use "capture" as the lead verb. Too passive. Use "keep," "hold," "have it there."
+- Never say "walk home" as if all users walk point-to-point. Use "when you stop" or "when you're done."
 
 ---
 
@@ -135,13 +157,15 @@ Lead with the problem, not the sender. Subject lines name the situation, not the
 | Use | Avoid | Why |
 |-----|-------|-----|
 | Walk | Session, activity, exercise | The user's frame is "going for a walk," not a workout |
-| Notes, thinking, thoughts | Content, entries, logs | Human language, not system-speak |
+| Thinking, thoughts | Content, entries, logs | Human language, not system-speak |
 | iCloud Drive | Cloud, sync, backup | Specific and concrete, not a category name |
 | Siri | Voice dictation, STT, speech recognition | What the user already calls it |
-| Document, doc | Entries, items (for the whole walk) | Each walk is one thing, not a collection |
-| Footnote | Foot.Note, FootNote | One word, no punctuation |
+| Document | Journal | "Journal" puts us in Day One territory |
+| Walk demarcation | Per-walk document, session | The doc is continuous; walks are marked within it, not separate |
+| Foot*note* | Foot.Note, FootNote | Italicize *note*; one word, no period |
 | One time (for Pro pricing) | One-time, subscription | No hyphen, emphasizes permanence |
 | Offline-first | Works offline, no internet required | Describes design intent, not just a limitation |
+| When you stop | Walk home | Not everyone walks home — loops, parks, routes |
 
 ---
 
@@ -149,15 +173,15 @@ Lead with the problem, not the sender. Subject lines name the situation, not the
 
 ## When to revisit
 
-- A significant shift in who's actually using Footnote (if the real user base diverges from the assumed A+ customer)
-- A major product change that alters the core promise (e.g., if AI tier becomes the primary pitch, not the add-on)
-- Key messages failing to land: if "your notes are in iCloud automatically" isn't the differentiator that converts, revisit the benefit framing
+- A significant shift in who's actually using Foot*note* (if the real user base diverges from the assumed A+ customer)
+- A major product change that alters the core promise (e.g., if AI becomes the primary pitch, not the add-on)
+- Key messages not converting: if the privacy story or zero-friction promise isn't the differentiator, revisit the benefit framing
 - The category gets crowded with direct competitors using the same language
 - A new platform (Apple Watch, native app) changes what the first experience is
 
 ## How to approach it
 
-Start by testing whether the A+ customer still holds: are the people who love Footnote the same people this framework describes? If yes, the story is probably still true. If not, the story changes before anything else. Value prop and benefit language drifts faster than the story, so test those against actual user language (reviews, DMs, how people describe it to friends) before rewriting.
+Start by testing whether the A+ customer still holds: are the people who love Foot*note* the same people this framework describes? If yes, the story is probably still true. If not, the story changes first. Value prop and benefit language drifts faster, so test those against actual user language (reviews, DMs, how people describe it to friends) before rewriting.
 
 ---
 
@@ -165,35 +189,35 @@ Start by testing whether the A+ customer still holds: are the people who love Fo
 
 ## Social post topics
 
-- The specific feeling of having a thought on a walk that you know you'll forget by the time you're home
-- Why voice memos don't work for walk-home thinking (it's not the transcription)
+- The specific feeling of having a thought mid-walk that you know won't survive until you stop
+- Why voice memos don't work for thinking while walking (it's not just the transcription)
 - What Jobs, Aristotle, and Darwin all had in common, and what it means for how you work
-- The walk where I figured out something I'd been stuck on for a month
+- EMDR and bilateral stimulation: why walking works for thoughts that feel stuck
+- The walk where I figured out something I'd been stuck on for months
 - What it actually means when you say "I do my best thinking on walks"
 - Why your phone makes walking worse, and one exception
-- The difference between capturing a thought and having a thought
-- What GPS-tagging a note does to how you remember it six months later
-- Why I built a notes app when there are already thousands of them
-- The thing about the walk home that no existing app was built for
+- The difference between having a thought and keeping a thought
+- Why I built another notes app when there are thousands of them
+- The thing about the walk that no existing app was built for
 
 ## Homepage hero headline options
 
-1. Walk home. Your thinking is there.
+1. Built for thinking on foot. *(leading)*
 2. For people who think on their feet.
-3. The walk-home thoughts you keep losing.
-4. Your best thinking happens while you're moving. Footnote is how you keep it.
-5. Built for thinking on foot.
+3. Think while you walk. Find it when you stop.
+4. Walk into your best thinking. Come back with it.
+5. Your best thinking happens while you're moving. Foot*note* is how you keep it. *(accurate, less evocative)*
 
 ## App Store headline options
 
-1. Walk home. Your thinking is there.
+1. Built for thinking on foot.
 2. For people who think on their feet.
-3. The journal that walks with you.
-4. Your walk-home thoughts, kept.
-5. One walk. One document. Always there.
+3. Think while you walk. Find it when you stop.
+4. Your walk, your thinking, always there.
+5. One document. Everything you've ever thought on a walk.
 
 ---
 
 # Bring it to life
 
-Footnote isn't competing on features. It's competing on understanding. The people it's for have already tried the alternatives and found them wanting, not because the alternatives are bad, but because they weren't built for this moment. The job is to make those people feel seen in every word, from the App Store listing to the first screen they open, so they know immediately: this one gets it.
+Foot*note* isn't competing on features. It's competing on understanding. The people it's for have already tried the alternatives and found them wanting — not because the alternatives are bad, but because they were built for a different mode of thinking. The job is to make those people feel seen in every word, from the first screen they open to the App Store listing, so they know immediately: this one was built for this.
