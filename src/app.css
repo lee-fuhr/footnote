@@ -511,64 +511,58 @@ html, body {
   50%       { opacity: .4; transform: scale(.7); }
 }
 
-/* ── Session list ───────────────────────────────────────────────────────── */
-#session-list {
-  border-top: 2px solid var(--rule);
-  padding: 20px 24px 40px;
+/* ── Journal scroll — past walks inline ─────────────────────────────────── */
+
+.journal-history { display: flex; flex-direction: column; }
+
+/* Walk block: one ended session */
+.walk-block {
+  padding: 0 0 32px;
 }
 
-.session-list-heading {
-  font-family: var(--font-mono);
-  font-size: .72rem;
-  color: var(--tan-text);
-  margin-bottom: 16px;
-}
-
-.session-list { display: flex; flex-direction: column; gap: 1px; }
-
-.session-empty {
-  font-style: italic;
-  color: var(--tan-text);
-  font-size: 1rem;
-  padding: 12px 0;
-}
-
-.session-card {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--rule);
-  cursor: pointer;
-}
-
-.session-card:last-child { border-bottom: none; }
-
-.session-card-left {
+/* Divider rule with metadata */
+.walk-rule {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  padding: 20px 0 14px;
+  border-top: 1px solid var(--rule);
+  margin-bottom: 16px;
 }
 
-.session-date {
+.walk-rule-date {
+  font-family: var(--font-body);
   font-size: 1.05rem;
+  font-weight: 500;
   color: var(--ink);
 }
 
-.session-meta {
+.walk-rule-meta {
   font-family: var(--font-mono);
-  font-size: .85rem;
+  font-size: .78rem;
   color: var(--tan-text);
+  letter-spacing: .01em;
 }
 
-.session-card-actions {
+/* Walk body text */
+.walk-body {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Walk action toolbar */
+.walk-toolbar {
   display: flex;
   gap: 8px;
-  flex-shrink: 0;
+  margin-top: 14px;
+  flex-wrap: wrap;
 }
 
-.session-card-actions button {
+.walk-toolbar button {
   font-family: var(--font-mono);
   font-size: .68rem;
   letter-spacing: .04em;
@@ -576,16 +570,64 @@ html, body {
   color: var(--tan-text);
   border: 1px solid var(--rule);
   border-radius: 4px;
-  padding: 0 8px;
-  min-height: 44px;
+  padding: 0 10px;
+  min-height: 36px;
   cursor: pointer;
   transition: color .15s, border-color .15s;
   white-space: nowrap;
 }
 
-.session-card-actions button:hover    { color: var(--tan-accent); border-color: var(--tan-accent); }
-.btn-delete:hover                     { color: #c0503a !important; border-color: #c0503a !important; }
-.session-card-actions button:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; }
+.walk-toolbar button:hover          { color: var(--tan-accent); border-color: var(--tan-accent); }
+.btn-walk-delete:hover              { color: #c0503a !important; border-color: #c0503a !important; }
+.walk-toolbar button:focus-visible  { outline: 2px solid var(--tan-accent); outline-offset: 2px; }
+
+/* Archive section — older than 30 days */
+.walk-archive {
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.walk-archive-label {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--tan-text);
+  padding: 16px 0 10px;
+  border-top: 1px solid var(--rule);
+}
+
+.walk-archive-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.walk-archive-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+  cursor: pointer;
+  transition: opacity .15s;
+}
+
+.walk-archive-item:last-child { border-bottom: none; }
+.walk-archive-item:hover      { opacity: .7; }
+
+.walk-archive-snippet {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.walk-archive-meta {
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  color: var(--tan-text);
+}
 
 /* ── Banners ────────────────────────────────────────────────────────────── */
 .install-banner {

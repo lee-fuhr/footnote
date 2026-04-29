@@ -3,7 +3,7 @@ import { startWatching } from './gps/index.js'
 import { initSession } from './session/manager.js'
 import { requestPersistence } from './storage/quota.js'
 import { Editor } from './ui/Editor.js'
-import { SessionList } from './ui/SessionList.js'
+import { JournalScroll } from './ui/JournalScroll.js'
 import { InstallBanner } from './ui/InstallBanner.js'
 import { StorageBanner } from './ui/StorageBanner.js'
 import { logger } from './logger.js'
@@ -42,14 +42,15 @@ async function boot() {
   // Storage banner (async, non-blocking)
   StorageBanner(bannerSlot)
 
-  // Editor
-  const sessionListComponent = SessionList(document.getElementById('session-list'), {
-    onSessionSelect: (id) => logger.info('app', 'session_selected', { id }),
+  // Editor + journal
+  const editor = Editor(document.getElementById('editor'), {
+    onLineAdded: () => {},
+    onSessionEnd: () => journal.render(),
   })
 
-  const editor = Editor(document.getElementById('editor'), {
-    onLineAdded: () => { /* live line count could update here */ },
-    onSessionEnd: () => sessionListComponent.render(),
+  const journal = JournalScroll(editor.journalHistory, {
+    canvasBody: editor.canvasBody,
+    onDelete: () => {},
   })
 
   // Check for in-progress session from last app open
@@ -67,8 +68,8 @@ async function boot() {
     logger.info('app', 'gps_permission', { status })
   })
 
-  // Render past sessions
-  sessionListComponent.render()
+  // Render journal history (scrolls to bottom after)
+  await journal.render()
 
   logger.info('app', 'booted')
 }

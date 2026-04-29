@@ -59,6 +59,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
       <span class="canvas-wordmark">${LOGO_SVG}<span>Foot<em>note</em></span></span>
     </div>
     <div class="canvas-body" aria-live="polite" aria-label="Walk notes">
+      <div class="journal-history"></div>
       <div class="canvas-empty">
         <p class="canvas-empty-prompt">${headline}</p>
         <p class="canvas-empty-tag">The thought that showed up at the corner.</p>
@@ -451,5 +452,5 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     setActive(true)
   }
 
-  return { handleStart, handleResume, setActive }
+  return { handleStart, handleResume, setActive, canvasBody, journalHistory: container.querySelector('.journal-history') }
 }
