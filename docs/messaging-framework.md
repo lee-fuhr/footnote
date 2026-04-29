@@ -39,7 +39,7 @@ But the tools built to capture that thinking were designed for someone sitting s
 
 You want to walk and then have it be there. Not a pile to sort through, not a half-finished note to decipher. The thought, in the order it came, in plain text you can read or share. An instrument built for thinking on foot, not borrowed from a different context.
 
-Foot*note* has one job. You open it, you walk, you speak or type. Everything goes into one continuous document, auto-saving as you go. When you stop, your walk is marked in context in iCloud Drive, readable. Nothing to retrieve. It's just there. And as Foot*note* grows, so will the ways it helps you do something with what the walk produces.
+Foot*note* has one job. You open it, you walk, you speak (or type). Everything goes into one continuous document, auto-saving as you go. When you stop, your walk is marked in context in iCloud Drive, readable. Nothing to retrieve. It's just there. And as Foot*note* grows, so will the ways it helps you do something with what the walk produces.
 
 ---
 

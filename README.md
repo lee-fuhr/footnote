@@ -8,7 +8,7 @@ Walking creates a specific kind of thinking. Not desk thinking. The kind where a
 
 Most tools aren't built for this. They were designed for someone sitting still, with time to organize and curate. When you're walking, that friction breaks the thread.
 
-Foot*note* has one job. You open it, you walk, you speak or type. Everything goes into one continuous document, saving as you go. When you stop, your walk is there. Timestamped, location-tagged, synced to iCloud. Nothing to retrieve. It's just there.
+Foot*note* has one job. You open it, you walk, you speak (or type). Everything goes into one continuous document, saving as you go. When you stop, your walk is there. Timestamped, location-tagged, synced to iCloud. Nothing to retrieve. It's just there.
 
 ## Free
 
