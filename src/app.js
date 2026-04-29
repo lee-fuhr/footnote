@@ -74,6 +74,17 @@ async function boot() {
   logger.info('app', 'booted')
 }
 
+// iOS standalone PWAs don't fire navigation events, so the SW never detects
+// updates on its own. Poll every 60s and reload when a new SW takes over.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.ready.then(reg => {
+    setInterval(() => reg.update(), 60_000)
+  })
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload()
+  })
+}
+
 boot().catch(err => {
   logger.error('app', 'boot_failed', { error: err.message })
   document.getElementById('app').innerHTML = '<p class="error">Failed to start. Please refresh.</p>'
