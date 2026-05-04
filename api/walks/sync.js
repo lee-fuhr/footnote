@@ -56,7 +56,10 @@ export default async function handler(req, res) {
   // ── GET: fetch walks for pipeline ────────────────────────────────────────
   if (req.method === 'GET') {
     const key = req.headers['x-footnote-key']
-    if (!PIPELINE_KEY || key !== PIPELINE_KEY) {
+    if (!PIPELINE_KEY) {
+      return res.status(503).json({ error: 'pipeline key not configured' })
+    }
+    if (key !== PIPELINE_KEY) {
       return res.status(401).json({ error: 'unauthorized' })
     }
 
