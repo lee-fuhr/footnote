@@ -108,6 +108,83 @@ Append-only log of what Lee notices using Footnote on actual walks. Each entry: 
 
 ---
 
+## 2026-04-29 — second walk (neighborhood, ~10:35–10:49 AM)
+
+### Bugs
+
+**B5. Phone locks mid-dictation, kills Siri session**
+- Severity: high. Phone locked while Lee was mid-note via Siri. Fell out of dictation, had to restart. Content state unclear.
+- Fix needed: `navigator.wakeLock.request('screen')` while a walk session is active. Release on session end or app background.
+- Status: open. Fix ready to ship.
+
+**B6. Cursor lands mid-text on re-focus**
+- Severity: high. After hitting checkmark (keyboard dismiss), tapping the note to re-enter puts cursor wherever you tapped — middle of existing text. User has to carefully tap the very end to resume dictating. In bright light, moving, hands full, this is a real barrier.
+- Fix: on `focus` event, move cursor to end (`textarea.setSelectionRange(len, len)`).
+- Status: open. One-liner fix.
+
+**B7. Debounce save unreliable for Siri dictation**
+- Severity: high. Current save fires 500ms after last `input` event. Two failure modes: (1) phone locks before 500ms elapses — timer never fires, content lost; (2) Siri commits text to the field as a batch event, then user hits checkmark — the app may not register a standard `input` event from Siri's commit, so debounce never starts.
+- Fix: also save on `blur` (keyboard dismiss) and `visibilitychange` (app goes to background).
+- Status: open. Fix ready to ship alongside B5 and B6.
+
+### UX / micro-friction
+
+**U3. Checkmark dismiss creates re-entry friction**
+- Hitting the iOS keyboard checkmark closes the keyboard. Getting back in requires tapping — and then B6 (cursor mid-text) compounds it. The checkmark is a friction trap for voice users.
+- Longer-term: consider whether the keyboard should auto-dismiss and re-focus between Siri utterances, or whether the input should stay active throughout.
+- Status: open.
+
+### Hardware / platform
+
+**H5. iPhone Action Button as walk start/stop**
+- One physical button, one dedicated action. Exact analog to the micro tape recorder (one button to record, one to stop). Zero screen interaction needed.
+- Feasibility: PWAs can register Shortcuts that fire Action Button via iOS Shortcuts app. Not native API access, but achievable without App Store.
+- Status: research. High potential for the zero-friction goal.
+
+### Product / strategic
+
+**P1. Zero friction is the whole product**
+- "I just start my walk, tap once, and for the rest of the walk I have zero friction to keep taking notes." Everything that violates this is a bug, even if it works technically.
+- Analog: the micro tape recorder. One button. No interface. The device disappears.
+- Status: design principle. Test every decision against it.
+
+**P2. Tagline candidates**
+- "For people who think on their feet"
+- "For people who think best on their feet"
+- Status: hold. Don't ship without messaging framework (see P4).
+
+**P3. Design language — slow and gentle**
+- Very slow transitions, faded animations — slower than typical apps in this space.
+- Not an aesthetic choice: it's a signal. The app should feel like it helps you slow down, quiet your mind, get more gentle with yourself.
+- Status: design principle. Apply to all animation work.
+
+**P4. Messaging framework + JTBD needed before wider launch**
+- Lee flagged: no JTBD framing exists yet. Need jobs-to-be-done to keep the build honest and focused.
+- Status: pre-bureau-launch gate.
+
+**P5. Basic telemetry before public launch**
+- Need to be able to say: "X hours logged, Y notes taken, Z miles walked."
+- Privacy-aligned: aggregate only, never individual content.
+- Status: pre-wider-launch gate.
+
+**P6. Security audit before sharing wider than the bureau**
+- Goal: someone running a network monitor should find nothing they weren't already told about.
+- Proof points: nothing leaves the phone, minimal collection evident in the UI.
+- Status: pre-bureau-launch gate.
+
+**P7. "No AI" as a pro tier bullet**
+- The last line of the pro tier feature list is literally "no AI."
+- Signals trust, privacy, intentionality. Unusual enough to be a differentiator.
+- Status: roadmap. Hold for pricing/tier work.
+
+**P8. iCloud sync as the privacy-aligned export solution**
+- Always-on background sync to a marked-up `.md` file (or multiple files) in iCloud Drive.
+- Solves three problems simultaneously: (1) export without a button, (2) backup, (3) proof that data stays in the Apple ecosystem.
+- Tagline-able: "your notes live in iCloud, not on our servers."
+- Status: strong candidate for Phase 1 or AI Pack. Investigate iCloud Drive API for PWAs.
+
+---
+
 ## Voice / framing material captured (not action items)
 
 > "I like this app as part of a movement of trying to figure out how to use modern capabilities and modern devices in a more responsible way for our well-being. As much as this is a screen, I'm trying to use it as a tool to help people be more present in their environment, and mindful with their thoughts."

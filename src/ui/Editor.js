@@ -1,6 +1,7 @@
 import { startSession, endSession, getState, getCurrentSessionId } from '../session/manager.js'
 import { appendChunk, flushChunk, setChunkTimer, chunkBodyText, getAllSessions } from '../db/index.js'
-import { hasFolder, requestFolder, autoExport } from '../export/icloud.js'
+import { hasFolder, requestFolder, autoExport, syncMasterJournal } from '../export/icloud.js'
+import { startLiveSync, stopLiveSync, fireSync } from '../session/livesync.js'
 import { flatCodaSheet } from './FlatCodaSheet.js'
 import { getLineLocation } from '../gps/index.js'
 import { GpsIndicator } from './GpsIndicator.js'
@@ -135,22 +136,36 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     _currentSession = session
     const sessionId = session.id
 
+    // Screen wakelock — keep display on while walk is active
+    let _wakeLock = null
+    const _acquireWakeLock = async () => {
+      if (!('wakeLock' in navigator)) return
+      try { _wakeLock = await navigator.wakeLock.request('screen') } catch {}
+    }
+    _acquireWakeLock()
+
+    // Immediate save — Siri compositionend + visibilitychange flush
+    async function saveNow() {
+      const { location, locationStatus } = getLineLocation()
+      await appendChunk(sessionId, textarea.value, {
+        timestamp: Date.now(),
+        location: locationStatus === 'live' ? location : null,
+      })
+    }
+    const _onVisChange = async () => {
+      if (document.visibilityState === 'hidden') {
+        await saveNow()
+        await fireSync()
+      } else {
+        _acquireWakeLock()
+      }
+    }
+
     // Restore saved content
     textarea.value = chunkBodyText(session.body)
 
     // Rewrite empty-state steps for flat-doc
     emptySteps.innerHTML = '<p>Start typing. Your walk saves as you go.</p>'
-
-    // Show end-walk button in footer
-    const footer = container.querySelector('.canvas-footer')
-    let endBtn = footer.querySelector('.walk-end-btn')
-    if (!endBtn) {
-      endBtn = document.createElement('button')
-      endBtn.className = 'walk-end-btn'
-      endBtn.textContent = 'End walk'
-      endBtn.style.cssText = 'min-height:56px;margin-left:auto;display:block;'
-      footer.appendChild(endBtn)
-    }
 
     // Voice-active indicator (pulsing dot in footer)
     const voiceIndicator = container.querySelector('.voice-indicator')
@@ -176,7 +191,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
           timestamp: Date.now(),
           location: locationStatus === 'live' ? location : null,
         })
-      }, 500))
+      }, 100))
     }
 
     // ── Voice recognition (flat-doc only) ──────────────────────────────── //
@@ -203,7 +218,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
               timestamp: Date.now(),
               location: locationStatus === 'live' ? location : null,
             })
-          }, 500))
+          }, 100))
 
           if (nearBottom) {
             textarea.scrollTop = textarea.scrollHeight
@@ -229,15 +244,19 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
       }
     }
 
-    // Walk-end handler
-    async function handleEnd() {
-      const ok = await confirmSheet('End this walk?', {
-        okLabel: 'end walk',
-        cancelLabel: 'keep going',
-      })
-      if (!ok) return
+    // Snapshot reader for live sync — always returns the freshest chunk array.
+    async function readSession() {
+      const stored = (await getAllSessions()).find(s => s.id === sessionId)
+      return { ...session, body: stored?.body ?? [], endedAt: stored?.endedAt ?? null }
+    }
 
-      // Stop voice before flush — prevents restart after stop()
+    // Live iCloud sync: writes walk-{startedAt}.md every 10s + on chunk fire +
+    // on visibilitychange hidden. The filename is stable so writes are idempotent.
+    startLiveSync(readSession, 10_000)
+
+    // Back arrow = "I'm done here" — saves, exports, exits silently.
+    async function exitWalk() {
+      stopLiveSync()
       if (_voice) {
         _voice.stop()
         voiceIndicator.hidden = true
@@ -252,16 +271,21 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
       })
       await endSession()
 
-      // Re-read to get the final chunk array for export
       const stored = (await getAllSessions()).find(s => s.id === sessionId)
+      const sessionForExport = { ...session, body: stored?.body ?? [], endedAt: stored?.endedAt ?? Date.now() }
 
-      // iCloud auto-export — first walk opens the folder picker (walk-end
-      // is a user gesture, so showDirectoryPicker is allowed). Subsequent
-      // walks write silently. If the user cancels or permission lapses,
-      // the walk is still saved locally.
-      const sessionForExport = { ...session, body: stored?.body ?? [], endedAt: Date.now() }
+      // First walk needs the folder picker — back-arrow tap is the user gesture.
       if (!(await hasFolder())) await requestFolder()
       const exportResult = await autoExport(sessionForExport)
+
+      if (_wakeLock) { _wakeLock.release(); _wakeLock = null }
+      textarea.removeEventListener('compositionend', saveNow)
+      document.removeEventListener('visibilitychange', _onVisChange)
+      backBtn.removeEventListener('click', exitWalk)
+
+      // Update master journal file with all completed walks
+      const allSessions = await getAllSessions()
+      await syncMasterJournal(allSessions.filter(s => s.endedAt !== null))
 
       textarea.value = ''
       setActive(false)
@@ -270,18 +294,20 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
       flatCodaSheet(sessionForExport)
     }
 
-    textarea.addEventListener('input', handleInput)
-    endBtn.addEventListener('click', handleEnd)
-
-    // Inactivity prompt
-    const _inactivityHandler = async () => {
-      const ok = await confirmSheet('Still out there? Tap to keep going.', {
-        okLabel: 'keep going',
-        cancelLabel: 'end walk',
-      })
-      if (!ok) handleEnd()
+    // First-tap folder prompt — textarea focus is a user gesture, so
+    // showDirectoryPicker is allowed. Runs once per walk if not yet granted.
+    let _folderPromptTried = false
+    async function maybePromptFolder() {
+      if (_folderPromptTried) return
+      _folderPromptTried = true
+      if (!(await hasFolder())) await requestFolder()
     }
-    document.addEventListener('footnote:inactivity-prompt', _inactivityHandler)
+
+    textarea.addEventListener('input', handleInput)
+    textarea.addEventListener('compositionend', saveNow)
+    textarea.addEventListener('focus', maybePromptFolder, { once: true })
+    document.addEventListener('visibilitychange', _onVisChange)
+    backBtn.addEventListener('click', exitWalk)
   }
 
   // ── Legacy (body === null) UI ─────────────────────────────────────────── //
@@ -399,8 +425,13 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     }
   })
 
-  textarea.addEventListener('focus', () => {
+  let _startingWalk = false
+  textarea.addEventListener('focus', async () => {
     emptyState.hidden = true
+    if (getState() !== ACTIVE && !_startingWalk) {
+      _startingWalk = true
+      try { await handleStart() } finally { _startingWalk = false }
+    }
   })
 
   textarea.addEventListener('blur', () => {

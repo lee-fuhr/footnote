@@ -4,6 +4,31 @@ All notable changes to Foot.Note are documented here.
 
 ---
 
+## v0.3.0 — 2026-04-29
+
+### Field test fixes, slow transitions, master journal file
+
+**Siri reliability (field-tested today)**
+- Screen stays on while a walk is active — `wakeLock` prevents mid-dictation lock
+- Words are safe the instant Siri commits — `compositionend` saves immediately, no button press required
+- Phone lock / app background flushes to IndexedDB before going dark (`visibilitychange`)
+- Save debounce reduced from 500ms to 100ms
+
+**iCloud — master journal file**
+- Walk end now writes two files: the per-walk file (unchanged) and `footnote-journal.md` — one file with all walks, newest first, always current
+- Your notes are just there. No export step.
+
+**Design — slow transitions**
+- All interactions run at 2–3× the typical speed: buttons, sheets, paragraph entry
+- The app now moves at a different pace than everything else on your phone
+
+**Journal scroll**
+- Past walks render inline as one continuous scroll, demarcated by date/time/duration rules
+- Walks older than 30 days collapse into an archive list with auto-generated titles
+- Opens scrolled to the bottom — picks up where you left off
+
+---
+
 ## v0.2.0 — 2026-04-28
 
 ### iCloud auto-export, flat-doc Coda review, session resume, idea form

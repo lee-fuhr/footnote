@@ -78,6 +78,26 @@ html, body {
   flex-shrink: 0;
 }
 
+.walk-back-btn {
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--tan-accent);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 8px;
+  margin: -8px 0 -8px -8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.walk-back-btn:hover { color: var(--ink); }
+.walk-back-btn:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; border-radius: 6px; }
+
 .btn-end-walk {
   font-family: var(--font-mono);
   font-size: .7rem;
@@ -89,7 +109,7 @@ html, body {
   min-height: 44px;
   cursor: pointer;
   letter-spacing: .04em;
-  transition: color .15s, border-color .15s;
+  transition: color .4s, border-color .4s;
 }
 
 .btn-end-walk:hover { color: var(--tan-accent); border-color: var(--tan-accent); }
@@ -251,11 +271,11 @@ html, body {
   display: grid;
   grid-template-columns: 18px 1fr;
   gap: 0 10px;
-  animation: para-in .2s ease both;
+  animation: para-in .6s ease both;
 }
 
 @keyframes para-in {
-  from { opacity: 0; transform: translateY(5px); }
+  from { opacity: 0; transform: translateY(3px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -270,7 +290,7 @@ html, body {
   align-items: flex-start;
   justify-content: center;
   opacity: .45;
-  transition: opacity .15s;
+  transition: opacity .4s;
   -webkit-tap-highlight-color: transparent;
   position: relative;
 }
@@ -330,7 +350,7 @@ html, body {
   padding: 20px 24px;
   padding-bottom: max(20px, env(safe-area-inset-bottom));
   transform: translateY(100%);
-  transition: transform .22s cubic-bezier(.4,0,.2,1);
+  transition: transform .45s cubic-bezier(.4,0,.2,1);
   z-index: 100;
   max-width: 640px;
   margin: 0 auto;
@@ -463,7 +483,7 @@ html, body {
   border-radius: 50%;
   background: var(--rule);
   flex-shrink: 0;
-  transition: background .3s;
+  transition: background .5s;
 }
 
 .gps-label-text {
@@ -573,7 +593,7 @@ html, body {
   padding: 0 10px;
   min-height: 36px;
   cursor: pointer;
-  transition: color .15s, border-color .15s;
+  transition: color .4s, border-color .4s;
   white-space: nowrap;
 }
 

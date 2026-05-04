@@ -31,6 +31,27 @@ export async function requestFolder() {
   }
 }
 
+export async function syncMasterJournal(sessions) {
+  const handle = _handle ?? await getMeta('folderHandle')
+  if (!handle) return { saved: false, reason: 'no-folder' }
+  try {
+    const perm = await handle.queryPermission({ mode: 'readwrite' })
+    if (perm !== 'granted') {
+      const req = await handle.requestPermission({ mode: 'readwrite' })
+      if (req !== 'granted') return { saved: false, reason: 'permission-denied' }
+    }
+    const sorted = [...sessions].sort((a, b) => b.startedAt - a.startedAt)
+    const content = sorted.map(s => sessionToMarkdown(s, s.locationAnchors ?? [])).join('\n\n---\n\n')
+    const fileHandle = await handle.getFileHandle('footnote-journal.md', { create: true })
+    const writable = await fileHandle.createWritable()
+    await writable.write(content)
+    await writable.close()
+    return { saved: true }
+  } catch {
+    return { saved: false, reason: 'error' }
+  }
+}
+
 export async function autoExport(session) {
   // Prefer in-memory handle; fall back to IDB (works in browsers across reloads)
   const handle = _handle ?? await getMeta('folderHandle')
