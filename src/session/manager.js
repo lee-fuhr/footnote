@@ -3,6 +3,7 @@ import { shouldStartNewSession } from './gap.js'
 import { openSession, closeSession, appendLine, getLastActiveSessionId, initChunkBody, getAllSessions, appendLocationAnchor } from '../db/index.js'
 import { startAnchorPoller, stopAnchorPoller } from '../gps/index.js'
 import { logger } from '../logger.js'
+import { startServerSync, stopServerSync, syncWalkToServer } from '../sync/server.js'
 
 let _state = IDLE
 let _currentSessionId = null
@@ -124,6 +125,11 @@ async function _doOpen() {
   _lastLineTs = Date.now()
   applyEffects(result.effects, session)
   startAnchorPoller(anchor => appendLocationAnchor(_currentSessionId, anchor))
+  // Start 60s server sync for in-progress protection
+  startServerSync(async () => {
+    const sessions = await getAllSessions()
+    return sessions.find(s => s.id === _currentSessionId) ?? null
+  })
   logger.info('session', 'opened', { sessionId: session.id })
   return session
 }
@@ -141,8 +147,10 @@ export async function startSession() {
 export async function endSession() {
   if (_state !== ACTIVE) return
   stopAnchorPoller()
+  stopServerSync()
+  const sessionId = _currentSessionId
   const result = transition(_state, 'closeSession')
-  await closeSession(_currentSessionId)
+  await closeSession(sessionId)
   applyEffects(result.effects)
   _state = result.state
 
@@ -151,6 +159,11 @@ export async function endSession() {
   _state = confirm.state
   _currentSessionId = null
   logger.info('session', 'closed')
+
+  // Final authoritative sync — fire-and-forget, never blocks UI
+  const sessions = await getAllSessions()
+  const closed = sessions.find(s => s.id === sessionId)
+  if (closed) syncWalkToServer(closed).catch(() => {})
 }
 
 export async function addLine(text, location, locationStatus) {
