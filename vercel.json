@@ -4,6 +4,9 @@
   "functions": {
     "api/**/*.js": {
       "maxDuration": 10
+    },
+    "api/process-insights.js": {
+      "maxDuration": 30
     }
   },
   "crons": [

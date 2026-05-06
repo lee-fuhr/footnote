@@ -1901,3 +1901,182 @@ a.link-philosophy:visited {
   font-size: .8rem;
   color: var(--tan-accent);
 }
+
+/* ── Consent sheet ──────────────────────────────────────────────────────── */
+.consent-sheet-scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(28,24,20,.45);
+  z-index: 460;
+}
+.consent-sheet-scrim.open { display: block; }
+
+.consent-sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  max-width: 640px;
+  margin: 0 auto;
+  background: var(--bg);
+  border-top: 1px solid var(--rule);
+  box-shadow: 0 -4px 32px rgba(28,24,20,.14);
+  padding: 28px 24px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform .38s cubic-bezier(.4,0,.2,1);
+  z-index: 461;
+}
+.consent-sheet.open { transform: translateY(0); }
+
+.consent-sheet-body { margin-bottom: 24px; }
+
+.consent-sheet-heading {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+
+.consent-sheet-text {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  color: var(--tan-text);
+  line-height: 1.7;
+  letter-spacing: .02em;
+  margin: 0 0 10px;
+}
+.consent-sheet-text:last-child { margin-bottom: 0; }
+
+.consent-sheet-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.consent-btn-no,
+.consent-btn-yes {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  letter-spacing: .05em;
+  min-height: 44px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity .18s;
+}
+.consent-btn-no {
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--tan-text);
+}
+.consent-btn-yes {
+  background: var(--tan-accent);
+  border: 1px solid var(--tan-accent);
+  color: var(--bg);
+}
+.consent-btn-no:hover  { opacity: .7; }
+.consent-btn-yes:hover { opacity: .85; }
+.consent-btn-no:focus-visible,
+.consent-btn-yes:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; }
+
+/* ── Insights cluster cards ─────────────────────────────────────────────── */
+.insights-cluster-card {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+  cursor: default;
+  animation: para-in .5s ease both;
+}
+.insights-cluster-card:last-child { border-bottom: none; }
+
+.insights-cluster-name {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--ink);
+  margin-bottom: 5px;
+}
+
+.insights-cluster-summary {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  color: var(--tan-text);
+  line-height: 1.6;
+  letter-spacing: .02em;
+  margin-bottom: 8px;
+}
+
+.insights-cluster-meta {
+  font-family: var(--font-mono);
+  font-size: .64rem;
+  color: var(--tan-accent);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* ── Insights loading / error / footer states ───────────────────────────── */
+.insights-loading-msg {
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  color: var(--tan-text);
+  text-align: center;
+  padding: 60px 0;
+  letter-spacing: .04em;
+  animation: para-in .4s ease both;
+}
+
+.insights-error-msg {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  color: var(--tan-text);
+  text-align: center;
+  padding: 48px 0 16px;
+  letter-spacing: .02em;
+}
+
+.insights-retry-btn {
+  display: block;
+  margin: 0 auto;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .06em;
+  color: var(--tan-accent);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 8px 20px;
+  cursor: pointer;
+  min-height: 44px;
+  transition: border-color .18s;
+}
+.insights-retry-btn:hover { border-color: var(--tan-accent); }
+
+.insights-footer {
+  padding-top: 28px;
+  text-align: center;
+}
+.insights-last-analyzed {
+  font-family: var(--font-mono);
+  font-size: .64rem;
+  color: var(--tan-quiet);
+  letter-spacing: .04em;
+}
+.insights-last-analyzed.insights-stale {
+  color: var(--tan-text);
+}
+
+/* ── Insights analyze button ────────────────────────────────────────────── */
+.insights-analyze-btn {
+  background: transparent;
+  border: none;
+  color: var(--tan-text);
+  cursor: pointer;
+  padding: 4px;
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .18s;
+  border-radius: 4px;
+}
+.insights-analyze-btn:hover { color: var(--tan-accent); }
+.insights-analyze-btn:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; }
