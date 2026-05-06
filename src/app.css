@@ -2080,3 +2080,128 @@ a.link-philosophy:visited {
 }
 .insights-analyze-btn:hover { color: var(--tan-accent); }
 .insights-analyze-btn:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; }
+
+/* ── Insights cluster detail panel ─────────────────────────────────────── */
+.insights-detail {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  transform: translateX(100%);
+  transition: transform .38s cubic-bezier(.4,0,.2,1);
+  z-index: 455;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.insights-detail.open { transform: translateX(0); }
+
+.insights-detail-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 28px 24px;
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+}
+
+.insights-detail-summary {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--ink);
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+
+.insights-detail-stat {
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  color: var(--tan-accent);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.insights-detail-walk {
+  padding: 16px 0;
+  border-top: 1px solid var(--rule);
+  animation: para-in .5s ease both;
+}
+
+.insights-detail-walk-date {
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  color: var(--tan-text);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.insights-detail-walk-text {
+  font-family: var(--font-body);
+  font-size: .95rem;
+  color: var(--ink);
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.insights-detail-no-walks {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  color: var(--tan-text);
+  padding: 20px 0;
+}
+
+.insights-detail-loading {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  color: var(--tan-text);
+  padding: 60px 0;
+  text-align: center;
+  letter-spacing: .04em;
+}
+
+.insights-detail-future {
+  margin-top: 32px;
+  padding: 16px;
+  background: var(--tan-fill);
+  border: 1px solid rgba(139,111,71,.18);
+  border-radius: 8px;
+}
+
+.insights-detail-future-label {
+  font-family: var(--font-mono);
+  font-size: .64rem;
+  color: var(--tan-accent);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+
+.insights-detail-future-desc {
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  color: var(--tan-text);
+  line-height: 1.6;
+  letter-spacing: .02em;
+  margin: 0;
+}
+
+/* ── Cluster card tap state ─────────────────────────────────────────────── */
+.insights-cluster-card {
+  cursor: pointer;
+  transition: background .12s;
+  border-radius: 4px;
+  margin: 0 -8px;
+  padding: 16px 8px;
+  border-bottom: 1px solid var(--rule);
+}
+.insights-cluster-card:last-child { border-bottom: none; }
+.insights-cluster-card:hover,
+.insights-cluster-card:focus-visible {
+  background: var(--tan-fill);
+  outline: none;
+}
+.insights-cluster-card:focus-visible {
+  outline: 2px solid var(--tan-accent);
+  outline-offset: 2px;
+}
