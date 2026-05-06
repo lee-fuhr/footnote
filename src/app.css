@@ -570,6 +570,7 @@ html, body {
 /* ── Journal scroll — past walks inline ─────────────────────────────────── */
 
 .journal-history { display: flex; flex-direction: column; }
+.canvas-body.walk-active .journal-history { display: none; }
 
 /* Walk block: one ended session */
 .walk-block {

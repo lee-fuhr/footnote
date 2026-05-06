@@ -248,7 +248,8 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
         _voice.start()
         voiceIndicator.hidden = false
         voiceIndicator.classList.add('voice-indicator--active')
-        voiceIndicator.querySelector('.voice-label').textContent = voiceLabel
+        voiceIndicator.querySelector('.voice-label').textContent = 'Listening…'
+        textarea.blur()
         voiceIndicator.addEventListener('click', () => {
           if (_voice) {
             _voice.stop()
@@ -425,11 +426,11 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     emptyState.hidden = active
     tapLabel.hidden = active
     textarea.placeholder = active ? '…continue' : 'tap to start your walk'
+    canvasBody.classList.toggle('walk-active', active)
     if (active) {
       startGpsRefresh()
       gpsIndicator.update()
       updateCoords()
-      textarea.focus()
     } else {
       stopGpsRefresh()
       textarea.style.height = 'auto'
@@ -450,7 +451,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
 
   canvasBody.addEventListener('click', e => {
     if (!e.target.closest('.para-wrap') && !e.target.closest('.para-info-btn')) {
-      textarea.focus()
+      if (!document.querySelector('.voice-indicator--active')) textarea.focus()
     }
   })
 
