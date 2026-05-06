@@ -10,6 +10,7 @@ import { codaSheet } from './CodaSheet.js'
 import { LegacySessionView } from './LegacySessionView.js'
 import { logger } from '../logger.js'
 import { VoiceRecognition } from '../voice/recognition.js'
+import { settingsSheet, GEAR_SVG } from './SettingsSheet.js'
 
 const ACTIVE = 'ACTIVE'
 const DRAFT_KEY = 'footnote_draft'
@@ -58,6 +59,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
   container.innerHTML = `
     <div class="canvas-header">
       <span class="canvas-wordmark">${LOGO_SVG}<span>Foot<em>note</em></span></span>
+      <button class="settings-btn" aria-label="Settings" title="Settings">${GEAR_SVG}</button>
     </div>
     <div class="canvas-body" aria-live="polite" aria-label="Walk notes">
       <div class="journal-history"></div>
@@ -100,6 +102,8 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
   const gpsCoords   = container.querySelector('.gps-coords')
 
   const gpsIndicator = GpsIndicator(gpsSlot)
+
+  container.querySelector('.settings-btn').addEventListener('click', () => settingsSheet())
 
   let _gpsInterval = null
   let _opening     = false
