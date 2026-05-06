@@ -7,6 +7,7 @@ import { JournalScroll } from './ui/JournalScroll.js'
 import { InstallBanner } from './ui/InstallBanner.js'
 import { StorageBanner } from './ui/StorageBanner.js'
 import { logger } from './logger.js'
+import { initInsights } from './ui/InsightsSheet.js'
 
 // Legacy event relay: old deployments fire 'footnote:stack-complete'.
 // Re-dispatch as the new event name so any long-lived tab keeps working.
@@ -52,6 +53,9 @@ async function boot() {
     canvasBody: editor.canvasBody,
     onDelete: () => {},
   })
+
+  // Insights swipe navigation — wires gesture to canvas, no Editor dependency
+  initInsights(editor.canvasBody)
 
   // Check for in-progress session from last app open
   const resumed = await initSession((session, reason) => {

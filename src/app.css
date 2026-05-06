@@ -1793,3 +1793,111 @@ a.link-philosophy:visited {
 }
 .settings-done-btn:hover { border-color: var(--tan-accent); }
 .settings-done-btn:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; }
+
+/* ── Insights sheet ─────────────────────────────────────────────────────── */
+.insights-sheet {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  transform: translateX(100%);
+  transition: transform .38s cubic-bezier(.4,0,.2,1);
+  z-index: 450;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.insights-sheet.open { transform: translateX(0); }
+
+.insights-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px 10px;
+  padding-top: max(12px, env(safe-area-inset-top));
+  border-bottom: 1px solid var(--rule);
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.insights-back-btn {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--tan-accent);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  min-height: 44px;
+  min-width: 44px;
+  transition: color .18s;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.insights-back-btn:hover { color: var(--ink); }
+.insights-back-btn:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; border-radius: 4px; }
+
+.insights-title {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
+  flex: 1;
+  text-align: center;
+}
+
+.insights-header-actions {
+  min-width: 44px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.insights-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 32px 24px;
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+}
+
+.insights-empty {
+  text-align: center;
+  padding: 60px 0 40px;
+}
+
+.insights-empty-heading {
+  font-family: var(--font-body);
+  font-size: 1.3rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.insights-empty-sub {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  color: var(--tan-text);
+  letter-spacing: .03em;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 260px;
+  margin: 0 auto;
+}
+
+/* ── Insights swipe hint ────────────────────────────────────────────────── */
+.insights-hint {
+  position: fixed;
+  right: 20px;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  color: var(--tan-text);
+  letter-spacing: .06em;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.7;
+  transition: opacity .3s;
+  z-index: 10;
+}
+.insights-hint:not([hidden]) { display: flex; align-items: center; gap: 4px; }
+.insights-hint-arrow {
+  font-size: .8rem;
+  color: var(--tan-accent);
+}
