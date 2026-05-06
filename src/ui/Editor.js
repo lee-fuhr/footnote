@@ -68,9 +68,10 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
         <div class="canvas-empty-steps"></div>
         <a class="canvas-about-link link-philosophy" href="/about.html">About Footnote</a>
       </div>
+      <label class="walk-tap-label" for="canvas-input" aria-hidden="true"></label>
     </div>
     <div class="canvas-input-wrap">
-      <textarea class="canvas-input" placeholder="tap to start your walk" rows="2"
+      <textarea id="canvas-input" class="canvas-input" placeholder="tap to start your walk" rows="2"
         aria-label="Walk note"
         autocorrect="off" autocapitalize="sentences" spellcheck="false"
         autocomplete="off" data-gramm="false" data-gramm_editor="false"
@@ -79,7 +80,14 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     <div class="canvas-footer">
       <span class="gps-indicator-slot"></span>
       <span class="gps-coords" aria-live="polite"></span>
-      <button class="voice-indicator" aria-live="polite" title="Voice recording active — tap to stop" hidden></button>
+      <button class="voice-indicator" aria-live="polite" title="Tap to stop" hidden>
+        <svg width="10" height="13" viewBox="0 0 10 13" fill="none" aria-hidden="true">
+          <rect x="2.5" y="0.5" width="5" height="8" rx="2.5" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M1 8a4 4 0 0 0 8 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="5" y1="12" x2="5" y2="12.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        <span class="voice-label"></span>
+      </button>
     </div>
 
     <div class="para-info-sheet-scrim"></div>
@@ -102,6 +110,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
   const gpsCoords   = container.querySelector('.gps-coords')
 
   const gpsIndicator = GpsIndicator(gpsSlot)
+  const tapLabel = container.querySelector('.walk-tap-label')
 
   container.querySelector('.settings-btn').addEventListener('click', () => settingsSheet())
 
@@ -239,6 +248,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
         _voice.start()
         voiceIndicator.hidden = false
         voiceIndicator.classList.add('voice-indicator--active')
+        voiceIndicator.querySelector('.voice-label').textContent = voiceLabel
         voiceIndicator.addEventListener('click', () => {
           if (_voice) {
             _voice.stop()
@@ -414,6 +424,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
 
   function setActive(active) {
     emptyState.hidden = active
+    tapLabel.hidden = active
     textarea.placeholder = active ? '…continue' : 'tap to start your walk'
     if (active) {
       startGpsRefresh()

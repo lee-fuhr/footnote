@@ -140,6 +140,16 @@ html, body {
   padding: 24px 24px 8px;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
+  position: relative;
+}
+
+/* Transparent label overlay — iOS opens keyboard when label for input is tapped */
+.walk-tap-label {
+  position: absolute;
+  inset: 0;
+  cursor: text;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Instructional empty state / onboarding */
@@ -532,21 +542,29 @@ html, body {
   flex: 1;
 }
 
-/* Voice-active indicator (pulsing dot, same pattern as GPS) */
+/* Voice-active indicator — mic icon + platform label */
 .voice-indicator {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--tan-accent);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: var(--tan-accent);
+  cursor: pointer;
+  padding: 4px 0;
+  font-family: var(--font-mono);
+  font-size: .70rem;
+  letter-spacing: .03em;
   flex-shrink: 0;
 }
 
 .voice-indicator--active {
-  animation: voice-pulse .9s ease infinite;
+  animation: voice-pulse 1.4s ease infinite;
 }
 
 @keyframes voice-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: .4; transform: scale(.7); }
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .45; }
 }
 
 /* ── Journal scroll — past walks inline ─────────────────────────────────── */
