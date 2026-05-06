@@ -1982,6 +1982,219 @@ body:has(.voice-indicator--active) .insights-hint { opacity: 0; pointer-events: 
   color: var(--tan-accent);
 }
 
+/* ── iCloud setup guide ─────────────────────────────────────────────────── */
+.icloud-setup-sheet {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 410;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(100%);
+  transition: transform .38s cubic-bezier(.4,0,.2,1);
+}
+.icloud-setup-sheet.open { transform: translateY(0); }
+
+.icloud-setup-header {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: 14px 8px;
+  border-bottom: 1px solid var(--rule);
+  flex-shrink: 0;
+}
+.icloud-setup-close {
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--tan-text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icloud-setup-title {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
+  text-align: center;
+}
+
+.icloud-setup-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 24px 24px;
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+}
+
+.icloud-setup-intro {
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  color: var(--tan-text);
+  line-height: 1.7;
+  letter-spacing: .02em;
+  margin: 0 0 28px;
+}
+
+.icloud-setup-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  counter-reset: step;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.icloud-setup-step {
+  counter-increment: step;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.icloud-step-label {
+  font-family: var(--font-body);
+  font-size: .97rem;
+  color: var(--ink);
+  line-height: 1.4;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.icloud-step-label::before {
+  content: counter(step);
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--tan-accent);
+  min-width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
+
+/* ── iOS Settings simulator ─────────────────────────────────────────────── */
+.icloud-sim {
+  background: #F2F2F7;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.icloud-sim-titlebar {
+  font-size: .72rem;
+  font-weight: 600;
+  color: #3C3C43;
+  text-align: center;
+  padding: 8px 12px 4px;
+  letter-spacing: -.01em;
+}
+
+.icloud-sim-section-header {
+  font-size: .6rem;
+  color: #6C6C70;
+  letter-spacing: .04em;
+  padding: 6px 16px 4px;
+}
+
+.icloud-sim-group {
+  background: white;
+  border-radius: 10px;
+  margin: 0 12px 8px;
+  overflow: hidden;
+}
+
+.icloud-sim-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: .8rem;
+  color: #000;
+  border-bottom: .5px solid #C6C6C8;
+  position: relative;
+}
+.icloud-sim-row:last-child { border-bottom: none; }
+.icloud-sim-row--hl { background: rgba(0, 122, 255, .10); }
+
+.icloud-sim-app-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .85rem;
+  flex-shrink: 0;
+  color: white;
+}
+.icloud-sim-row-label { flex: 1; line-height: 1.25; }
+.icloud-sim-row-label--bold { font-weight: 600; }
+.icloud-sim-value { font-size: .75rem; color: #8E8E93; }
+.icloud-sim-chevron { font-size: .8rem; color: #C7C7CC; flex-shrink: 0; }
+.icloud-sim-check { font-size: .85rem; color: #007AFF; font-weight: 600; flex-shrink: 0; }
+
+.icloud-sim-footer {
+  font-size: .62rem;
+  color: #8E8E93;
+  line-height: 1.5;
+  padding: 6px 16px 10px;
+}
+
+/* ── CTA and footnote ───────────────────────────────────────────────────── */
+.icloud-setup-cta {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--tan-accent);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  letter-spacing: .05em;
+  text-align: center;
+  text-decoration: none;
+  min-height: 48px;
+  line-height: 48px;
+  border-radius: 6px;
+  transition: opacity .18s;
+  margin-bottom: 16px;
+}
+.icloud-setup-cta:hover { opacity: .85; }
+
+.icloud-setup-note {
+  font-family: var(--font-mono);
+  font-size: .66rem;
+  color: var(--tan-quiet);
+  line-height: 1.7;
+  letter-spacing: .02em;
+  margin: 0;
+  text-align: center;
+}
+
+/* ── Autosave row tappable state (iOS) ──────────────────────────────────── */
+.settings-row--action {
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0,0,0,.06);
+}
+.settings-row--action:active { opacity: .7; }
+.settings-row-chevron {
+  font-size: 1rem;
+  color: var(--tan-quiet);
+  padding-left: 4px;
+  flex-shrink: 0;
+}
+
 /* ── Consent sheet ──────────────────────────────────────────────────────── */
 .consent-sheet-scrim {
   display: none;

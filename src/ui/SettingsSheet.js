@@ -1,6 +1,7 @@
 import { getMeta, storeMeta } from '../db/index.js'
 import { requestFolder } from '../export/icloud.js'
 import { FEATURES } from '../features.js'
+import { openICloudSetup } from './ICloudSetupSheet.js'
 
 const VERSION = '0.1.0'
 
@@ -32,14 +33,14 @@ function _ensureEl() {
 
     <div class="settings-section">
       <div class="settings-section-label">Journal</div>
-      <div class="settings-row">
+      <div class="settings-row ${typeof globalThis.showDirectoryPicker !== 'function' ? 'settings-row--action' : ''}">
         <div class="settings-row-info">
           <div class="settings-row-name">Autosave</div>
           <div class="settings-row-desc settings-folder-name">Saved in app</div>
         </div>
         ${typeof globalThis.showDirectoryPicker === 'function'
           ? '<button class="settings-folder-btn">Choose folder</button>'
-          : ''}
+          : '<span class="settings-row-chevron" aria-hidden="true">›</span>'}
       </div>
     </div>
 
@@ -102,6 +103,9 @@ function _ensureEl() {
         folderBtn.textContent = 'Change'
       }
     })
+  } else {
+    const autosaveRow = sheet.querySelector('.settings-row--action')
+    autosaveRow?.addEventListener('click', openICloudSetup)
   }
 
   sheet.querySelectorAll('.settings-toggle-input').forEach(input => {
