@@ -1,6 +1,7 @@
 import { getMeta, storeMeta, getAllSessions, chunkBodyText } from '../db/index.js'
 import { requestConsent } from './ConsentSheet.js'
 import { getTier } from '../tier.js'
+import { waitlistSheet } from './WaitlistSheet.js'
 
 let _el = null
 let _touchStartX = 0
@@ -109,10 +110,7 @@ function _ensureEl() {
   backBtn.addEventListener('click', close)
   analyzeBtn.addEventListener('click', () => _runAnalysis(sheet))
   retryBtn.addEventListener('click', () => _runAnalysis(sheet))
-  unlockBtn.addEventListener('click', () => {
-    // Payment flow — stub until purchase session
-    alert('AI Pack coming soon. Stay tuned!')
-  })
+  unlockBtn.addEventListener('click', () => waitlistSheet())
 
   clusters.addEventListener('click', e => {
     const card = e.target.closest('.insights-cluster-card')
