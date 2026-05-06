@@ -30,17 +30,18 @@ function _ensureEl() {
       <button class="settings-sheet-close" aria-label="Close settings">×</button>
     </div>
 
-    ${typeof globalThis.showDirectoryPicker === 'function' ? `
     <div class="settings-section">
       <div class="settings-section-label">Journal</div>
       <div class="settings-row">
         <div class="settings-row-info">
-          <div class="settings-row-name">Local folder</div>
-          <div class="settings-row-desc settings-folder-name">No folder selected</div>
+          <div class="settings-row-name">Autosave</div>
+          <div class="settings-row-desc settings-folder-name">Saved in app</div>
         </div>
-        <button class="settings-folder-btn">Choose</button>
+        ${typeof globalThis.showDirectoryPicker === 'function'
+          ? '<button class="settings-folder-btn">Choose folder</button>'
+          : ''}
       </div>
-    </div>` : ''}
+    </div>
 
     <div class="settings-section">
       <div class="settings-section-label">Coming soon</div>
@@ -116,15 +117,17 @@ function _ensureEl() {
 export async function settingsSheet() {
   const el = _ensureEl()
 
+  const folderHandle = await getMeta('folderHandle')
   if (el.folderBtn) {
-    const folderHandle = await getMeta('folderHandle')
     if (folderHandle) {
       el.folderName.textContent = folderHandle.name
       el.folderBtn.textContent = 'Change'
     } else {
-      el.folderName.textContent = 'No folder selected'
-      el.folderBtn.textContent = 'Choose'
+      el.folderName.textContent = 'Saved in app'
+      el.folderBtn.textContent = 'Choose folder'
     }
+  } else {
+    el.folderName.textContent = 'Saved in app'
   }
 
   const inputs = el.sheet.querySelectorAll('.settings-toggle-input')
