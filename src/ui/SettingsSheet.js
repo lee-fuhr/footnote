@@ -2,6 +2,7 @@ import { getMeta, storeMeta } from '../db/index.js'
 import { requestFolder } from '../export/icloud.js'
 import { FEATURES } from '../features.js'
 import { openICloudSetup } from './ICloudSetupSheet.js'
+import { requestConsent } from './ConsentSheet.js'
 
 const VERSION = '0.1.0'
 
@@ -45,6 +46,22 @@ function _ensureEl() {
     </div>
 
     <div class="settings-section">
+      <div class="settings-section-label">Privacy</div>
+      <div class="settings-row">
+        <div class="settings-row-info">
+          <div class="settings-row-name">AI analysis</div>
+          <div class="settings-row-desc">Find patterns across your walks</div>
+        </div>
+        <label class="settings-toggle" aria-label="Enable AI analysis">
+          <input type="checkbox" class="settings-ai-toggle" />
+          <span class="settings-toggle-track">
+            <span class="settings-toggle-thumb"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-section">
       <div class="settings-section-label">Coming soon</div>
       ${FEATURES.map(f => `
         <div class="settings-row">
@@ -82,6 +99,7 @@ function _ensureEl() {
   const doneBtn    = sheet.querySelector('.settings-done-btn')
   const folderBtn  = sheet.querySelector('.settings-folder-btn')
   const folderName = sheet.querySelector('.settings-folder-name')
+  const aiToggle   = sheet.querySelector('.settings-ai-toggle')
 
   const dismiss = () => {
     sheet.classList.remove('open')
@@ -108,13 +126,22 @@ function _ensureEl() {
     autosaveRow?.addEventListener('click', openICloudSetup)
   }
 
+  aiToggle.addEventListener('change', async () => {
+    if (!aiToggle.checked) {
+      await storeMeta('insightsConsentGiven', false)
+    } else {
+      const agreed = await requestConsent()
+      if (!agreed) aiToggle.checked = false
+    }
+  })
+
   sheet.querySelectorAll('.settings-toggle-input').forEach(input => {
     input.addEventListener('change', () => {
       storeMeta(`feature_${input.dataset.feature}`, input.checked)
     })
   })
 
-  _el = { sheet, scrim, folderName, folderBtn }
+  _el = { sheet, scrim, folderName, folderBtn, aiToggle }
   return _el
 }
 
@@ -133,6 +160,8 @@ export async function settingsSheet() {
   } else {
     el.folderName.textContent = 'Auto-downloads as .md — set Safari → Downloads → iCloud Drive'
   }
+
+  el.aiToggle.checked = (await getMeta('insightsConsentGiven')) === true
 
   const inputs = el.sheet.querySelectorAll('.settings-toggle-input')
   await Promise.all([...inputs].map(async input => {
