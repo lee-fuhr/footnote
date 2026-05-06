@@ -127,7 +127,7 @@ export async function settingsSheet() {
       el.folderBtn.textContent = 'Choose folder'
     }
   } else {
-    el.folderName.textContent = 'Saved in app'
+    el.folderName.textContent = 'Auto-downloads as .md — set Safari → Downloads → iCloud Drive'
   }
 
   const inputs = el.sheet.querySelectorAll('.settings-toggle-input')

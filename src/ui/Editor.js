@@ -1,6 +1,6 @@
 import { startSession, endSession, getState, getCurrentSessionId } from '../session/manager.js'
 import { appendChunk, flushChunk, setChunkTimer, chunkBodyText, getAllSessions } from '../db/index.js'
-import { hasFolder, requestFolder, autoExport, syncMasterJournal } from '../export/icloud.js'
+import { hasFolder, requestFolder, autoExport, syncMasterJournal, downloadWalkFile } from '../export/icloud.js'
 import { startLiveSync, stopLiveSync, fireSync } from '../session/livesync.js'
 import { flatCodaSheet } from './FlatCodaSheet.js'
 import { getLineLocation } from '../gps/index.js'
@@ -297,9 +297,8 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
       const stored = (await getAllSessions()).find(s => s.id === sessionId)
       const sessionForExport = { ...session, body: stored?.body ?? [], endedAt: stored?.endedAt ?? Date.now() }
 
-      // First walk needs the folder picker — back-arrow tap is the user gesture.
-      if (!(await hasFolder())) await requestFolder()
       const exportResult = await autoExport(sessionForExport)
+      if (!exportResult.saved) downloadWalkFile(sessionForExport)
 
       if (_wakeLock) { _wakeLock.release(); _wakeLock = null }
       textarea.removeEventListener('compositionend', saveNow)
@@ -312,7 +311,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
 
       textarea.value = ''
       setActive(false)
-      showToast(emptyState, emptyPrompt, exportResult.saved ? 'Walk saved to iCloud.' : 'Walk saved.')
+      showToast(emptyState, emptyPrompt, exportResult.saved ? 'Walk saved to iCloud.' : 'Walk downloaded — find it in Files.')
       onSessionEnd?.()
       flatCodaSheet(sessionForExport)
     }

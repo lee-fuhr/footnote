@@ -52,6 +52,23 @@ export async function syncMasterJournal(sessions) {
   }
 }
 
+// Triggers a .md file download in the browser — on iOS, files land in the
+// Safari downloads folder (set to iCloud Drive in Safari settings for
+// automatic cloud backup). Called when FSA folder export is unavailable.
+export function downloadWalkFile(session) {
+  const md = sessionToMarkdown(session, [])
+  const filename = formatFilename(session)
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  setTimeout(() => URL.revokeObjectURL(url), 2000)
+}
+
 export async function autoExport(session) {
   // Prefer in-memory handle; fall back to IDB (works in browsers across reloads)
   const handle = _handle ?? await getMeta('folderHandle')
