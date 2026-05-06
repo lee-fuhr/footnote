@@ -7,6 +7,7 @@
 const MAX_CHARS_PER_WALK = 8000  // ~2000 tokens each
 const MIN_WALKS = 3
 const HAIKU_MODEL = 'claude-haiku-4-5-20251001'
+const SONNET_MODEL = 'claude-sonnet-4-6'
 
 export const config = { maxDuration: 30 }
 
@@ -125,17 +126,72 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'processing failed' })
   }
 
+  // ── Sonnet exec summaries (one batched call) ───────────────────────── //
+  let sonnetUsage
+  if (clusters.length > 0) {
+    try {
+      const walkMap = new Map(walks.map(w => [w.id, w.text]))
+      const execPrompt = buildExecSummaryPrompt(clusters, walkMap)
+      const sonnetResp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': anthropicKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: SONNET_MODEL,
+          max_tokens: 2048,
+          messages: [{ role: 'user', content: execPrompt }],
+        }),
+      })
+
+      if (sonnetResp.ok) {
+        const sonnetData = await sonnetResp.json()
+        sonnetUsage = sonnetData.usage
+        const raw = sonnetData.content?.[0]?.text ?? ''
+        const jsonMatch = raw.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0])
+          const summaryMap = new Map(
+            Array.isArray(parsed.summaries)
+              ? parsed.summaries.map(s => [s.id, s.execSummary])
+              : []
+          )
+          clusters = clusters.map(c => ({
+            ...c,
+            execSummary: typeof summaryMap.get(c.id) === 'string'
+              ? summaryMap.get(c.id).slice(0, 600)
+              : null,
+          }))
+        }
+      } else {
+        console.error('[insights] Sonnet error:', sonnetResp.status)
+      }
+    } catch (err) {
+      console.error('[insights] exec summary error:', err.message)
+    }
+  }
+
   // Track budget usage (non-blocking)
-  if (kvBase && kvToken && usage) {
-    const inTokens = usage.input_tokens ?? estimatedInputTokens
-    const outTokens = usage.output_tokens ?? 200
-    // Haiku pricing: $0.80 input / $4.00 output per M tokens → cost in cents
-    const costCents = Math.ceil((inTokens * 0.0008 + outTokens * 0.004) / 10)
-    console.log(`[insights] done — ${inTokens}in/${outTokens}out tokens, ~${costCents}¢`)
-    Promise.all([
-      kv(kvBase, kvToken, 'POST', `incrby/insights:budget:${today}/${costCents}`),
-      kv(kvBase, kvToken, 'POST', `expire/insights:budget:${today}/172800`),
-    ]).catch(e => console.error('[insights] budget update error:', e.message))
+  if (kvBase && kvToken) {
+    const haiku = usage ?? {}
+    const sonnet = sonnetUsage ?? {}
+    const haikusIn = haiku.input_tokens ?? estimatedInputTokens
+    const haikusOut = haiku.output_tokens ?? 200
+    const sonnetIn = sonnet.input_tokens ?? 0
+    const sonnetOut = sonnet.output_tokens ?? 0
+    // Haiku: $0.80/$4.00 per M; Sonnet: $3.00/$15.00 per M → cents
+    const costCents = Math.ceil(
+      (haikusIn * 0.0008 + haikusOut * 0.004 + sonnetIn * 0.003 + sonnetOut * 0.015) / 10
+    )
+    console.log(`[insights] done — haiku ${haikusIn}in/${haikusOut}out, sonnet ${sonnetIn}in/${sonnetOut}out, ~${costCents}¢`)
+    if (kvToken) {
+      Promise.all([
+        kv(kvBase, kvToken, 'POST', `incrby/insights:budget:${today}/${costCents}`),
+        kv(kvBase, kvToken, 'POST', `expire/insights:budget:${today}/172800`),
+      ]).catch(e => console.error('[insights] budget update error:', e.message))
+    }
   }
 
   return res.status(200).json({
@@ -164,6 +220,34 @@ Return ONLY valid JSON, no explanation:
       "name": "Short specific name (3–6 words)",
       "summary": "One sentence describing the recurring pattern.",
       "walkIds": ["walk-id-1", "walk-id-2"]
+    }
+  ]
+}`
+}
+
+function buildExecSummaryPrompt(clusters, walkMap) {
+  const clusterBlocks = clusters.map(c => {
+    const walkTexts = c.walkIds
+      .map((id, i) => {
+        const text = (walkMap.get(id) ?? '').slice(0, 1500)
+        return `  Walk ${i + 1}:\n${text}`
+      })
+      .join('\n\n')
+    return `--- Cluster: ${c.id} ("${c.name}") ---\n${walkTexts}`
+  }).join('\n\n')
+
+  return `You are reading someone's personal walking journal. They've identified ${clusters.length} recurring theme${clusters.length === 1 ? '' : 's'} across their walks.
+
+For each cluster below, write an exec summary: 2–3 sentences that capture the emotional and intellectual character of this theme — what they're really wrestling with, not just what they wrote about. Be specific to their actual words. No generic summaries.
+
+${clusterBlocks}
+
+Return ONLY valid JSON, no explanation:
+{
+  "summaries": [
+    {
+      "id": "cluster-id",
+      "execSummary": "2-3 sentence summary."
     }
   ]
 }`

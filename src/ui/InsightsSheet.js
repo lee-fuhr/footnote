@@ -225,10 +225,11 @@ async function _openDetail(clusterId, detail) {
     .filter(s => s && s.endedAt && Array.isArray(s.body))
     .sort((a, b) => a.startedAt - b.startedAt)
 
-  const summarySection = `
-    <div class="insights-detail-summary">${_esc(cluster.summary)}</div>
-    <div class="insights-detail-stat">${cluster.walkIds.length} walk${cluster.walkIds.length === 1 ? '' : 's'}</div>
-  `
+  const summarySection = cluster.execSummary
+    ? `<div class="insights-detail-exec">${_esc(cluster.execSummary)}</div>
+       <div class="insights-detail-stat">${cluster.walkIds.length} walk${cluster.walkIds.length === 1 ? '' : 's'}</div>`
+    : `<div class="insights-detail-summary">${_esc(cluster.summary)}</div>
+       <div class="insights-detail-stat">${cluster.walkIds.length} walk${cluster.walkIds.length === 1 ? '' : 's'}</div>`
 
   const walkSections = clusterWalks.length > 0
     ? clusterWalks.map(s => {
@@ -244,14 +245,7 @@ async function _openDetail(clusterId, detail) {
       }).join('')
     : '<p class="insights-detail-no-walks">Walk content not available.</p>'
 
-  const futureSection = `
-    <div class="insights-detail-future">
-      <p class="insights-detail-future-label">Coming in AI Pack</p>
-      <p class="insights-detail-future-desc">Executive summary, how this theme evolved over time, and synthesized key points from your entries.</p>
-    </div>
-  `
-
-  body.innerHTML = summarySection + walkSections + futureSection
+  body.innerHTML = summarySection + walkSections
 }
 
 function _closeDetail(detail) {

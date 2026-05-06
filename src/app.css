@@ -2480,6 +2480,15 @@ body:has(.voice-indicator--active) .insights-hint { opacity: 0; pointer-events: 
   margin-bottom: 6px;
 }
 
+.insights-detail-exec {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
+  line-height: 1.7;
+  margin-bottom: 6px;
+  white-space: pre-wrap;
+}
+
 .insights-detail-stat {
   font-family: var(--font-mono);
   font-size: .66rem;
