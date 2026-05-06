@@ -77,7 +77,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     <div class="canvas-footer">
       <span class="gps-indicator-slot"></span>
       <span class="gps-coords" aria-live="polite"></span>
-      <span class="voice-indicator" aria-live="polite" aria-label="Voice recording active" hidden></span>
+      <button class="voice-indicator" aria-live="polite" title="Voice recording active — tap to stop" hidden></button>
     </div>
 
     <div class="para-info-sheet-scrim"></div>
@@ -121,8 +121,8 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
   function updateCoords() {
     const { location, locationStatus } = getLineLocation()
     if (locationStatus === 'live' && location) {
-      const { lat } = location
-      gpsCoords.textContent = `${Math.abs(lat).toFixed(3)}°${lat >= 0 ? 'N' : 'S'}`
+      const { lat, lng } = location
+      gpsCoords.textContent = `${Math.abs(lat).toFixed(3)}°${lat >= 0 ? 'N' : 'S'} ${Math.abs(lng).toFixed(3)}°${lng >= 0 ? 'E' : 'W'}`
     } else if (locationStatus === 'stale') {
       gpsCoords.textContent = 'GPS updating…'
     } else {
@@ -235,6 +235,15 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
         _voice.start()
         voiceIndicator.hidden = false
         voiceIndicator.classList.add('voice-indicator--active')
+        voiceIndicator.addEventListener('click', () => {
+          if (_voice) {
+            _voice.stop()
+            _voice = null
+          }
+          voiceIndicator.hidden = true
+          voiceIndicator.classList.remove('voice-indicator--active')
+          textarea.focus()
+        })
       } catch (err) {
         // SpeechRecognition unavailable at runtime (e.g. permission denied at
         // construction, or API not truly available despite the global existing).
@@ -305,6 +314,12 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
 
     textarea.addEventListener('input', handleInput)
     textarea.addEventListener('compositionend', saveNow)
+    textarea.addEventListener('blur', saveNow)
+    textarea.addEventListener('focus', () => {
+      // Move cursor to end so re-focus after keyboard dismiss doesn't land mid-text
+      const len = textarea.value.length
+      textarea.setSelectionRange(len, len)
+    })
     textarea.addEventListener('focus', maybePromptFolder, { once: true })
     document.addEventListener('visibilitychange', _onVisChange)
     backBtn.addEventListener('click', exitWalk)

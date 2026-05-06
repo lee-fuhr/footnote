@@ -11,7 +11,7 @@ import { sessionToMarkdown } from '../export/markdown.js'
 import { logger } from '../logger.js'
 
 const SYNC_URL = '/api/walks/sync'
-const INTERVAL_MS = 60_000
+const INTERVAL_MS = 10_000
 
 let _timer = null
 let _getSession = null

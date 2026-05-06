@@ -185,6 +185,37 @@ Append-only log of what Lee notices using Footnote on actual walks. Each entry: 
 
 ---
 
+## 2026-05-05 — third walk (neighborhood, ~8:31–8:43 AM)
+
+**Note:** Notes were captured locally but not synced to the server before iOS suspended the PWA. Content recovered from Lee's manual export. Root cause fixed: server sync reduced from 60s → 10s, blur-save added.
+
+### UX / friction
+
+**U4. Keyboard doesn't open on walk start — must tap input field manually**
+- Severity: high. Lee taps "start walk" and the keyboard stays hidden. Zero-friction goal requires the keyboard (and Siri dictation) to be available immediately.
+- Currently: walk starts on textarea focus, but that focus happens AFTER async session setup, which loses the iOS keyboard permission.
+- Fix direction: investigate autofocus on walk start; may require restructuring the start flow to keep the user gesture on the textarea focus.
+- Status: open. Needs investigation.
+
+**U5. Pulsating dot in lower-right corner — unclear**
+- Severity: medium. There's a pulsing dot (voice indicator) whose meaning is not obvious. Lee asked "what is that pulsating dot?"
+- It is not tappable and has no tooltip.
+- Fix shipped: converted from `<span>` to `<button>` with `title="Voice recording active — tap to stop"`. Tapping it stops voice and returns focus to the textarea.
+- Status: shipped (this session).
+
+**U6. GPS shows only N latitude — no E/W longitude**
+- Severity: low. Lee noticed the coordinate only shows `32.791°N` — no longitude.
+- Fix shipped: added longitude (`32.791°N 117.123°W`).
+- Status: shipped (this session).
+
+**U7. Two pulsating dots in footer — confusing**
+- Severity: medium. GPS indicator (always visible when live) + voice indicator (when active) = two pulsing elements with no clear distinction.
+- Users can't tell which is which.
+- Fix direction: visual differentiation (different shape, color, or label) between GPS dot and voice dot.
+- Status: open. Partial fix via U5 (voice dot now has tooltip and is a button).
+
+---
+
 ## Voice / framing material captured (not action items)
 
 > "I like this app as part of a movement of trying to figure out how to use modern capabilities and modern devices in a more responsible way for our well-being. As much as this is a screen, I'm trying to use it as a tool to help people be more present in their environment, and mindful with their thoughts."
