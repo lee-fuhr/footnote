@@ -1,6 +1,6 @@
 {
   "name": "footnote",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "A walking journal. Open source, offline-first PWA.",
   "type": "module",
   "scripts": {
