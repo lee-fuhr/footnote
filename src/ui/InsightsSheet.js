@@ -1,5 +1,6 @@
 import { getMeta, storeMeta, getAllSessions, chunkBodyText } from '../db/index.js'
 import { requestConsent } from './ConsentSheet.js'
+import { getTier } from '../tier.js'
 
 let _el = null
 let _touchStartX = 0
@@ -52,6 +53,31 @@ function _ensureEl() {
       <div class="insights-footer" hidden>
         <span class="insights-last-analyzed"></span>
       </div>
+      <div class="insights-locked" hidden>
+        <div class="insights-lock-preview" aria-hidden="true">
+          <div class="insights-cluster-card insights-cluster-card--mock">
+            <div class="insights-cluster-name">Morning clarity</div>
+            <div class="insights-cluster-summary">Thoughts that arrive in the first ten minutes of movement.</div>
+            <div class="insights-cluster-meta">4 walks ›</div>
+          </div>
+          <div class="insights-cluster-card insights-cluster-card--mock">
+            <div class="insights-cluster-name">Work &amp; tension</div>
+            <div class="insights-cluster-summary">What surfaces when you're carrying something unresolved.</div>
+            <div class="insights-cluster-meta">6 walks ›</div>
+          </div>
+          <div class="insights-cluster-card insights-cluster-card--mock">
+            <div class="insights-cluster-name">What matters most</div>
+            <div class="insights-cluster-summary">The recurring thread underneath the day-to-day thinking.</div>
+            <div class="insights-cluster-meta">8 walks ›</div>
+          </div>
+        </div>
+        <div class="insights-lock-overlay">
+          <p class="insights-lock-heading">Your walking thoughts,<br>organized.</p>
+          <p class="insights-lock-sub">Footnote finds recurring themes across your walks and distills them into a personal map of how you think.</p>
+          <button class="insights-unlock-btn">Unlock AI Pack</button>
+          <p class="insights-lock-note">Preview</p>
+        </div>
+      </div>
     </div>
   `
   document.body.appendChild(sheet)
@@ -78,9 +104,15 @@ function _ensureEl() {
   const retryBtn   = sheet.querySelector('.insights-retry-btn')
   const clusters   = sheet.querySelector('.insights-clusters')
 
+  const unlockBtn = sheet.querySelector('.insights-unlock-btn')
+
   backBtn.addEventListener('click', close)
   analyzeBtn.addEventListener('click', () => _runAnalysis(sheet))
   retryBtn.addEventListener('click', () => _runAnalysis(sheet))
+  unlockBtn.addEventListener('click', () => {
+    // Payment flow — stub until purchase session
+    alert('AI Pack coming soon. Stay tuned!')
+  })
 
   clusters.addEventListener('click', e => {
     const card = e.target.closest('.insights-cluster-card')
@@ -142,6 +174,7 @@ function _setState(sheet, state) {
   sheet.querySelector('.insights-error').hidden    = state !== 'error'
   sheet.querySelector('.insights-clusters').hidden = state !== 'clusters'
   sheet.querySelector('.insights-footer').hidden   = state !== 'clusters'
+  sheet.querySelector('.insights-locked').hidden   = state !== 'locked'
 }
 
 function _renderClusters(sheet, clusters, processedAt) {
@@ -387,6 +420,14 @@ export async function initInsights(canvasBody) {
 async function _openSheet() {
   const { sheet } = _ensureEl()
   sheet.classList.add('open')
+
+  const unlocked = (await getMeta('insightsUnlocked')) === true
+  const hasAccess = unlocked || getTier() === 'ai-pack'
+  if (!hasAccess) {
+    _setState(sheet, 'locked')
+    return
+  }
+
   await _refreshAnalyzeBtn()
   await _loadAndShow(sheet)
 }

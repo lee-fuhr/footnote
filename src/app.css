@@ -2357,6 +2357,81 @@ body:has(.voice-indicator--active) .insights-hint { opacity: 0; pointer-events: 
   color: var(--tan-text);
 }
 
+/* ── Insights locked / AI Pack gate ───────────────────────────────────── */
+
+.insights-locked {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.insights-lock-preview {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+  opacity: .6;
+  padding: 0 16px;
+}
+
+.insights-cluster-card--mock {
+  cursor: default;
+}
+
+.insights-lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 28px;
+  text-align: center;
+  background: linear-gradient(to bottom, rgba(245,240,230,0) 0%, rgba(245,240,230,.85) 30%);
+}
+
+.insights-lock-heading {
+  font-family: var(--font-body);
+  font-size: 1.18rem;
+  line-height: 1.35;
+  color: var(--ink);
+  font-weight: 500;
+  margin: 0 0 10px;
+}
+
+.insights-lock-sub {
+  font-family: var(--font-body);
+  font-size: .84rem;
+  line-height: 1.6;
+  color: var(--tan-text);
+  margin: 0 0 24px;
+  max-width: 280px;
+}
+
+.insights-unlock-btn {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .04em;
+  color: var(--tan-fill);
+  background: var(--tan-accent);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: opacity .18s;
+}
+.insights-unlock-btn:hover { opacity: .85; }
+.insights-unlock-btn:active { opacity: .7; }
+
+.insights-lock-note {
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  letter-spacing: .06em;
+  color: var(--tan-quiet);
+  font-style: italic;
+  margin: 14px 0 0;
+  text-transform: uppercase;
+}
+
 /* ── Insights analyze button ────────────────────────────────────────────── */
 .insights-analyze-btn {
   background: transparent;
