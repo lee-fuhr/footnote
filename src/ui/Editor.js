@@ -248,7 +248,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
         _voice.start()
         voiceIndicator.hidden = false
         voiceIndicator.classList.add('voice-indicator--active')
-        voiceIndicator.querySelector('.voice-label').textContent = 'Listening…'
+        voiceIndicator.querySelector('.voice-label').textContent = 'Dictating…'
         textarea.blur()
         voiceIndicator.addEventListener('click', () => {
           if (_voice) {
