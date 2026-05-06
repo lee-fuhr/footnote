@@ -2357,6 +2357,17 @@ body:has(.voice-indicator--active) .insights-hint { opacity: 0; pointer-events: 
   color: var(--tan-text);
 }
 
+.insights-power-note {
+  font-family: var(--font-body);
+  font-size: .78rem;
+  line-height: 1.55;
+  color: var(--tan-quiet);
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  font-style: italic;
+}
+
 /* ── Insights locked / AI Pack gate ───────────────────────────────────── */
 
 .insights-locked {

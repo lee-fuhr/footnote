@@ -23,10 +23,19 @@ export default async function handler(req, res) {
   const anthropicKey = process.env.ANTHROPIC_API_KEY
   if (!anthropicKey) return res.status(503).json({ error: 'AI not configured' })
 
-  const { walkIds, walkBodies } = req.body ?? {}
+  const { walkIds, walkBodies, previousSummaries } = req.body ?? {}
   if (!Array.isArray(walkIds) || !Array.isArray(walkBodies) || walkIds.length !== walkBodies.length) {
     return res.status(400).json({ error: 'walkIds and walkBodies arrays required' })
   }
+
+  // Build lookup of previous exec summaries keyed by cluster id
+  const prevSummaryMap = new Map(
+    Array.isArray(previousSummaries)
+      ? previousSummaries
+          .filter(s => s?.id && typeof s.execSummary === 'string')
+          .map(s => [s.id, { walkIds: new Set(Array.isArray(s.walkIds) ? s.walkIds : []), execSummary: s.execSummary }])
+      : []
+  )
 
   if (walkIds.length < MIN_WALKS) {
     return res.status(200).json({
@@ -126,12 +135,29 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'processing failed' })
   }
 
-  // ── Sonnet exec summaries (one batched call) ───────────────────────── //
+  // ── Sonnet exec summaries (incremental — skip unchanged clusters) ─── //
+  function _setsEqual(a, b) {
+    if (a.size !== b.size) return false
+    for (const x of a) if (!b.has(x)) return false
+    return true
+  }
+
+  // Pre-fill clusters with cached summaries where walkIds haven't changed
+  clusters = clusters.map(c => {
+    const prev = prevSummaryMap.get(c.id)
+    if (prev?.execSummary && _setsEqual(new Set(c.walkIds), prev.walkIds)) {
+      return { ...c, execSummary: prev.execSummary }
+    }
+    return c
+  })
+
+  const clustersNeedingSummary = clusters.filter(c => !c.execSummary)
+
   let sonnetUsage
-  if (clusters.length > 0) {
+  if (clustersNeedingSummary.length > 0) {
     try {
       const walkMap = new Map(walks.map(w => [w.id, w.text]))
-      const execPrompt = buildExecSummaryPrompt(clusters, walkMap)
+      const execPrompt = buildExecSummaryPrompt(clustersNeedingSummary, walkMap)
       const sonnetResp = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -158,12 +184,11 @@ export default async function handler(req, res) {
               ? parsed.summaries.map(s => [s.id, s.execSummary])
               : []
           )
-          clusters = clusters.map(c => ({
-            ...c,
-            execSummary: typeof summaryMap.get(c.id) === 'string'
-              ? summaryMap.get(c.id).slice(0, 600)
-              : null,
-          }))
+          clusters = clusters.map(c => {
+            if (c.execSummary) return c  // already cached
+            const s = summaryMap.get(c.id)
+            return { ...c, execSummary: typeof s === 'string' ? s.slice(0, 600) : null }
+          })
         }
       } else {
         console.error('[insights] Sonnet error:', sonnetResp.status)
@@ -229,7 +254,7 @@ function buildExecSummaryPrompt(clusters, walkMap) {
   const clusterBlocks = clusters.map(c => {
     const walkTexts = c.walkIds
       .map((id, i) => {
-        const text = (walkMap.get(id) ?? '').slice(0, 1500)
+        const text = (walkMap.get(id) ?? '').slice(0, 500)
         return `  Walk ${i + 1}:\n${text}`
       })
       .join('\n\n')

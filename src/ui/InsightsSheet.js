@@ -53,6 +53,10 @@ function _ensureEl() {
       <div class="insights-clusters" hidden></div>
       <div class="insights-footer" hidden>
         <span class="insights-last-analyzed"></span>
+        <p class="insights-power-note" hidden>
+          You're walking more than most — Footnote's AI is designed for up to 2 walks a day.
+          You're above that, and we're keeping pace. A dedicated plan for high-volume walkers may come later.
+        </p>
       </div>
       <div class="insights-locked" hidden>
         <div class="insights-lock-preview" aria-hidden="true">
@@ -175,6 +179,21 @@ function _setState(sheet, state) {
   sheet.querySelector('.insights-locked').hidden   = state !== 'locked'
 }
 
+const POWER_USER_WALKS_PER_DAY = 2
+const POWER_USER_MIN_DAYS = 14
+
+async function _updatePowerNote(sheet) {
+  const sessions = await getAllSessions()
+  const completed = sessions.filter(s => s.endedAt && Array.isArray(s.body) && s.body.length > 0)
+  if (completed.length < 1) return
+  const earliest = Math.min(...completed.map(s => s.startedAt ?? Date.now()))
+  const daysSince = (Date.now() - earliest) / 86_400_000
+  const note = sheet.querySelector('.insights-power-note')
+  if (note) {
+    note.hidden = !(daysSince >= POWER_USER_MIN_DAYS && completed.length / daysSince > POWER_USER_WALKS_PER_DAY)
+  }
+}
+
 function _renderClusters(sheet, clusters, processedAt) {
   const container = sheet.querySelector('.insights-clusters')
   container.innerHTML = clusters.map(c => `
@@ -257,6 +276,7 @@ async function _loadAndShow(sheet) {
   if (cached?.clusters?.length) {
     _renderClusters(sheet, cached.clusters, cached.processedAt)
     _setState(sheet, 'clusters')
+    _updatePowerNote(sheet)
     return
   }
 
@@ -302,6 +322,7 @@ async function _runAnalysis(sheet) {
       if (cached?.clusters?.length) {
         _renderClusters(sheet, cached.clusters, cached.processedAt)
         _setState(sheet, 'clusters')
+        _updatePowerNote(sheet)
       } else {
         _setState(sheet, 'empty')
       }
@@ -310,10 +331,11 @@ async function _runAnalysis(sheet) {
   }
 
   const sessions = await getAllSessions()
-  const walks = sessions
-    .filter(s => s.endedAt && Array.isArray(s.body) && s.body.length > 0)
+  const completedSessions = sessions.filter(s => s.endedAt && Array.isArray(s.body) && s.body.length > 0)
+  const walks = completedSessions
     .map(s => ({
       id: s.id,
+      startedAt: s.startedAt,
       text: chunkBodyText(s.body).slice(0, MAX_CHARS_PER_WALK),
     }))
     .filter(w => w.text.trim().length > 20)
@@ -329,6 +351,12 @@ async function _runAnalysis(sheet) {
     return
   }
 
+  // Pass cached exec summaries so server can skip Sonnet for unchanged clusters
+  const cached = await getMeta('walkInsights')
+  const previousSummaries = (cached?.clusters ?? [])
+    .filter(c => c.execSummary)
+    .map(c => ({ id: c.id, walkIds: c.walkIds, execSummary: c.execSummary }))
+
   try {
     const resp = await fetch('/api/process-insights', {
       method: 'POST',
@@ -339,6 +367,7 @@ async function _runAnalysis(sheet) {
       body: JSON.stringify({
         walkIds: walks.map(w => w.id),
         walkBodies: walks.map(w => w.text),
+        previousSummaries,
       }),
     })
 
@@ -365,6 +394,7 @@ async function _runAnalysis(sheet) {
 
     _renderClusters(sheet, data.clusters, data.processedAt)
     _setState(sheet, 'clusters')
+    _updatePowerNote(sheet)
 
   } catch (err) {
     console.error('[insights] analysis failed:', err.message)
