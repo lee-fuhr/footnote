@@ -46,7 +46,7 @@ function _ensureEl() {
       </div>
       <div class="insights-error" hidden>
         <p class="insights-error-msg"></p>
-        <button class="insights-retry-btn">try again</button>
+        <button class="insights-retry-btn">Try again</button>
       </div>
       <div class="insights-clusters" hidden></div>
       <div class="insights-footer" hidden>

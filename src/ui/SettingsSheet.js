@@ -30,6 +30,7 @@ function _ensureEl() {
       <button class="settings-sheet-close" aria-label="Close settings">×</button>
     </div>
 
+    ${typeof globalThis.showDirectoryPicker === 'function' ? `
     <div class="settings-section">
       <div class="settings-section-label">Journal</div>
       <div class="settings-row">
@@ -37,9 +38,9 @@ function _ensureEl() {
           <div class="settings-row-name">Local folder</div>
           <div class="settings-row-desc settings-folder-name">No folder selected</div>
         </div>
-        <button class="settings-folder-btn">choose</button>
+        <button class="settings-folder-btn">Choose</button>
       </div>
-    </div>
+    </div>` : ''}
 
     <div class="settings-section">
       <div class="settings-section-label">Coming soon</div>
@@ -92,13 +93,15 @@ function _ensureEl() {
     if (e.key === 'Escape' && sheet.classList.contains('open')) dismiss()
   })
 
-  folderBtn.addEventListener('click', async () => {
-    const handle = await requestFolder()
-    if (handle) {
-      folderName.textContent = handle.name
-      folderBtn.textContent = 'change'
-    }
-  })
+  if (folderBtn) {
+    folderBtn.addEventListener('click', async () => {
+      const handle = await requestFolder()
+      if (handle) {
+        folderName.textContent = handle.name
+        folderBtn.textContent = 'Change'
+      }
+    })
+  }
 
   sheet.querySelectorAll('.settings-toggle-input').forEach(input => {
     input.addEventListener('change', () => {
@@ -113,13 +116,15 @@ function _ensureEl() {
 export async function settingsSheet() {
   const el = _ensureEl()
 
-  const folderHandle = await getMeta('folderHandle')
-  if (folderHandle) {
-    el.folderName.textContent = folderHandle.name
-    el.folderBtn.textContent = 'change'
-  } else {
-    el.folderName.textContent = 'No folder selected'
-    el.folderBtn.textContent = 'choose'
+  if (el.folderBtn) {
+    const folderHandle = await getMeta('folderHandle')
+    if (folderHandle) {
+      el.folderName.textContent = folderHandle.name
+      el.folderBtn.textContent = 'Change'
+    } else {
+      el.folderName.textContent = 'No folder selected'
+      el.folderBtn.textContent = 'Choose'
+    }
   }
 
   const inputs = el.sheet.querySelectorAll('.settings-toggle-input')
