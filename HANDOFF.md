@@ -19,14 +19,17 @@ The two editor fixes can't be verified headlessly — need Lee's iPhone:
 
 If they hold → commit + (already deployed). If not → iterate.
 
+## Resolved 2026-05-21 (committed + deployed)
+- **"Let it go" safety** — now a demoted quiet text link behind ★ Keep (was an equal-weight button). Tapping it confirms, then defers the delete behind a 5s undo toast (walk vanishes immediately, only commits if Undo isn't tapped). New `src/ui/UndoToast.js`. Rationale: in the single-doc model the walk is kept by default, so letting-go is a rare escape hatch, not a peer action.
+- **Manual export** — wired into Settings as "Export journal": downloads the *whole* journal as one flat .md (`journalToMarkdown`, shared with the synced master file so they can't drift). Chose whole-journal over single-walk because Settings is global and single-doc = one document. The orphaned single-walk `downloadWalkFile` is now truly unused.
+
 ## Open design taste-calls (Lee's, none blocking)
-- **"Let it go" deletes the walk instantly, no confirm** — flagged as data-safety risk. Add confirm/undo or leave?
-- Inline wording "Kept. Let it go?"; the ★ Keep marker.
-- **Manual export button** — `downloadWalkFile` is now orphaned (unhooked from walk-end), ready to wire into Settings if wanted.
+- Inline wording is now "Kept." + ★ Keep + a quiet "let it go". Tune if wanted.
 - **Legacy resumed-walk path** (`body: null`) still uses the old `codaSheet` review sheet; new flat-doc walks never hit it.
+- **Dead CSS:** old `.btn-walk-letgo` button rules still sit in `app.css` (couldn't edit it, it's over the 500-line cap, needs `SKIP_HOOK_BLOAT_WATCHER=1`). New styles live in `src/coda.css`. Cleanup = bypass the cap to delete them, or split app.css properly.
 
 ## State / gotchas
-- **All of today's work is DEPLOYED but NOT git-committed.** Next session should review the diff and commit if good. Repo: `/Users/lee/Sites/footnote` (git, deploys via `vercel --prod --yes`).
+- **Today's earlier work + tonight's changes are committed AND deployed.** Repo: `/Users/lee/Sites/footnote` (git, deploys via `vercel --prod --yes`). Latest prod CSS bundle: `index-l9vCL2rT.css`.
 - **Editor.js is a 532-line god-file** (over the 500 cap) — needed `SKIP_HOOK_BLOAT_WATCHER=1` to edit. Follow-up: split it (most new logic already lives in `captureLayout.js`).
 - Tests: `npx vitest run` → 278/278 green. Privacy guard test: `tests/privacy.egress.test.js` (mutation-verified).
 - Lee runs AI Pack himself, so his walks still sync and keep the walk-mining pipeline fed.
