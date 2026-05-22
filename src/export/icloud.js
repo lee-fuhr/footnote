@@ -31,6 +31,14 @@ export async function requestFolder() {
   }
 }
 
+// Serializes every walk into one flat markdown document, newest first,
+// walks separated by a horizontal rule. The single source of truth for both
+// the synced master journal file and the manual Settings export.
+export function journalToMarkdown(sessions) {
+  const sorted = [...sessions].sort((a, b) => b.startedAt - a.startedAt)
+  return sorted.map(s => sessionToMarkdown(s, s.locationAnchors ?? [])).join('\n\n---\n\n')
+}
+
 export async function syncMasterJournal(sessions) {
   const handle = _handle ?? await getMeta('folderHandle')
   if (!handle) return { saved: false, reason: 'no-folder' }
@@ -40,8 +48,7 @@ export async function syncMasterJournal(sessions) {
       const req = await handle.requestPermission({ mode: 'readwrite' })
       if (req !== 'granted') return { saved: false, reason: 'permission-denied' }
     }
-    const sorted = [...sessions].sort((a, b) => b.startedAt - a.startedAt)
-    const content = sorted.map(s => sessionToMarkdown(s, s.locationAnchors ?? [])).join('\n\n---\n\n')
+    const content = journalToMarkdown(sessions)
     const fileHandle = await handle.getFileHandle('footnote-journal.md', { create: true })
     const writable = await fileHandle.createWritable()
     await writable.write(content)
@@ -63,6 +70,22 @@ export function downloadWalkFile(session) {
   const a = document.createElement('a')
   a.href = url
   a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  setTimeout(() => URL.revokeObjectURL(url), 2000)
+}
+
+// Downloads the entire journal as one flat .md file, the manual escape hatch
+// in Settings, for the rare moment someone wants their whole document in hand.
+// On iOS, lands in Safari downloads (set to iCloud Drive for cloud backup).
+export function downloadJournalFile(sessions) {
+  const md = journalToMarkdown(sessions)
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'footnote-journal.md'
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)

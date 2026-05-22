@@ -1,5 +1,5 @@
-import { getMeta, storeMeta } from '../db/index.js'
-import { requestFolder } from '../export/icloud.js'
+import { getMeta, storeMeta, getAllSessions } from '../db/index.js'
+import { requestFolder, downloadJournalFile } from '../export/icloud.js'
 import { FEATURES } from '../features.js'
 import { openICloudSetup } from './ICloudSetupSheet.js'
 import { requestConsent } from './ConsentSheet.js'
@@ -42,6 +42,13 @@ function _ensureEl() {
         ${typeof globalThis.showDirectoryPicker === 'function'
           ? '<button class="settings-folder-btn">Choose folder</button>'
           : '<span class="settings-row-chevron" aria-hidden="true">›</span>'}
+      </div>
+      <div class="settings-row settings-row--quiet">
+        <div class="settings-row-info">
+          <div class="settings-row-name">Export journal</div>
+          <div class="settings-row-desc">Download everything you’ve written as one markdown file.</div>
+        </div>
+        <button class="settings-export-btn">Export</button>
       </div>
     </div>
 
@@ -100,6 +107,7 @@ function _ensureEl() {
   const folderBtn  = sheet.querySelector('.settings-folder-btn')
   const folderName = sheet.querySelector('.settings-folder-name')
   const aiToggle   = sheet.querySelector('.settings-ai-toggle')
+  const exportBtn  = sheet.querySelector('.settings-export-btn')
 
   const dismiss = () => {
     sheet.classList.remove('open')
@@ -125,6 +133,12 @@ function _ensureEl() {
     const autosaveRow = sheet.querySelector('.settings-row--action')
     autosaveRow?.addEventListener('click', openICloudSetup)
   }
+
+  exportBtn.addEventListener('click', async () => {
+    const sessions = (await getAllSessions()).filter(s => s.endedAt !== null)
+    if (sessions.length === 0) return
+    downloadJournalFile(sessions)
+  })
 
   aiToggle.addEventListener('change', async () => {
     if (!aiToggle.checked) {

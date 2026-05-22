@@ -41,6 +41,17 @@ describe('JournalScroll — inline walk-end affordance', () => {
     expect(src).toContain('deleteSession')
   })
 
+  it('Let it go is a demoted text link, not a button peer of Keep', () => {
+    expect(src).toContain('btn-walk-letgo-link')
+  })
+
+  it('Let it go confirms first, then defers the delete behind an undo window', () => {
+    expect(src).toContain('confirmSheet')
+    expect(src).toContain('undoToast')
+    // The delete must be the toast commit, not run synchronously on click.
+    expect(src).toMatch(/onCommit[\s\S]*deleteSession/)
+  })
+
   it('keeps the walk by default — no auto-prune, no confirm required for inline Keep', () => {
     // The inline Keep path must not delete; only the explicit Let it go deletes.
     expect(src).toMatch(/let it go/i)

@@ -22,3 +22,19 @@ describe('SettingsSheet — AI analysis disclosure', () => {
     expect(src).not.toContain('—')
   })
 })
+
+describe('SettingsSheet — export journal', () => {
+  it('offers an Export journal action', () => {
+    expect(src).toContain('Export journal')
+    expect(src).toContain('settings-export-btn')
+  })
+
+  it('exports the whole journal via downloadJournalFile', () => {
+    expect(src).toContain('downloadJournalFile')
+    expect(src).toContain('getAllSessions')
+  })
+
+  it('only exports finished walks', () => {
+    expect(src).toMatch(/endedAt !== null/)
+  })
+})

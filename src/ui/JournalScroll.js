@@ -1,6 +1,7 @@
 import { getAllSessions, getSessionLines, deleteSession, chunkBodyText, interpolateLocation } from '../db/index.js'
 import { shareSessionAsMarkdown, shareSessionAsText } from '../export/share.js'
 import { confirmSheet } from './ConfirmSheet.js'
+import { undoToast } from './UndoToast.js'
 import { flatCodaSheet } from './FlatCodaSheet.js'
 import { isSessionStarred, markSessionStarred } from '../session/starred.js'
 
@@ -75,12 +76,15 @@ function buildWalkEl(session, text, { justEnded = false } = {}) {
   // The just-finished walk gets an inline Keep / Let it go row attached to its
   // own section, not a separate screen. Doing nothing keeps the walk; pruning
   // is optional. Keep stars the section in place; Let it go removes it.
+  // Default is keep: the walk is already in the document. ★ Keep is the only
+  // real affordance; letting go is a rare, quiet escape hatch, so it rides as a
+  // demoted text link rather than a button competing with Keep.
   const coda = justEnded
     ? `
     <div class="walk-coda" role="group" aria-label="What to do with this walk">
-      <span class="walk-coda-prompt">Kept. Let it go?</span>
-      <button class="btn-walk-letgo" data-id="${session.id}">Let it go</button>
-      <button class="btn-walk-keep"  data-id="${session.id}">&#9733; Keep</button>
+      <span class="walk-coda-prompt">Kept.</span>
+      <button class="btn-walk-keep" data-id="${session.id}">&#9733; Keep</button>
+      <button class="btn-walk-letgo-link" data-id="${session.id}">let it go</button>
     </div>`
     : ''
 
@@ -198,13 +202,28 @@ export function JournalScroll(historyEl, { canvasBody, onDelete } = {}) {
       })
     })
 
-    // Inline Let it go removes this walk's section from the document.
-    historyEl.querySelectorAll('.btn-walk-letgo').forEach(btn => {
+    // Inline let it go removes this walk's section from the document. It is
+    // destructive, so it confirms first, then defers the delete behind an undo
+    // window: the section vanishes immediately but only commits if Undo isn't
+    // tapped. Belt and suspenders for a rare, irreversible action.
+    historyEl.querySelectorAll('.btn-walk-letgo-link').forEach(btn => {
       btn.addEventListener('click', async e => {
         e.stopPropagation()
-        await deleteSession(btn.dataset.id)
-        onDelete?.()
-        await render()
+        const id = btn.dataset.id
+        const ok = await confirmSheet('Let this walk go?', {
+          okLabel: 'let it go', cancelLabel: 'keep it', danger: true,
+        })
+        if (!ok) return
+        const block = historyEl.querySelector(`.walk-block[data-id="${id}"]`)
+        if (block) block.style.display = 'none'
+        undoToast('Walk let go.', {
+          onCommit: async () => {
+            await deleteSession(id)
+            onDelete?.()
+            await render()
+          },
+          onUndo: () => { if (block) block.style.display = '' },
+        })
       })
     })
   }

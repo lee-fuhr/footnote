@@ -1,0 +1,92 @@
+/* Walk-end coda refinements + the undo toast.
+   Split out of app.css (which is over the line cap). Loaded after app.css in
+   index.html, so the letgo override here intentionally supersedes the older
+   .btn-walk-letgo button styling. */
+
+/* Letting a walk go is rare and destructive — a quiet, borderless text link
+   that sits behind Keep, never competing with it. */
+.btn-walk-letgo-link {
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  letter-spacing: .03em;
+  background: transparent;
+  color: var(--tan-text);
+  border: none;
+  padding: 0 4px;
+  min-height: 36px;
+  cursor: pointer;
+  opacity: .55;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity .4s, color .4s;
+  white-space: nowrap;
+}
+
+.btn-walk-letgo-link:hover { opacity: 1; color: var(--ink); }
+.btn-walk-letgo-link:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; }
+
+/* Undo toast — a calm strip at the foot of the screen during the grace window
+   after a soft-destructive action. Brown/tan palette, minimum motion. */
+.undo-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translate(-50%, 140%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .22);
+  font-family: var(--font-mono);
+  font-size: .76rem;
+  letter-spacing: .02em;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .35s ease, opacity .35s ease;
+  z-index: 1200;
+}
+
+.undo-toast.open {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.undo-toast-btn {
+  font-family: var(--font-mono);
+  font-size: .76rem;
+  letter-spacing: .04em;
+  background: transparent;
+  color: var(--tan-accent);
+  border: none;
+  padding: 4px 6px;
+  min-height: 32px;
+  cursor: pointer;
+  text-transform: lowercase;
+}
+
+.undo-toast-btn:hover { color: var(--cream); }
+.undo-toast-btn:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; }
+
+/* The export row in Settings is a quiet, secondary action. */
+.settings-row--quiet .settings-export-btn {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .03em;
+  background: transparent;
+  color: var(--tan-text);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0 14px;
+  min-height: 36px;
+  cursor: pointer;
+  transition: color .4s, border-color .4s;
+  white-space: nowrap;
+}
+
+.settings-row--quiet .settings-export-btn:hover { color: var(--tan-accent); border-color: var(--tan-accent); }
+.settings-row--quiet .settings-export-btn:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; }
