@@ -1,8 +1,7 @@
 import { startSession, endSession, getState, getCurrentSessionId } from '../session/manager.js'
 import { appendChunk, flushChunk, setChunkTimer, chunkBodyText, getAllSessions } from '../db/index.js'
-import { hasFolder, requestFolder, autoExport, syncMasterJournal, downloadWalkFile } from '../export/icloud.js'
+import { hasFolder, requestFolder, autoExport, syncMasterJournal } from '../export/icloud.js'
 import { startLiveSync, stopLiveSync, fireSync } from '../session/livesync.js'
-import { flatCodaSheet } from './FlatCodaSheet.js'
 import { getLineLocation } from '../gps/index.js'
 import { GpsIndicator } from './GpsIndicator.js'
 import { confirmSheet } from './ConfirmSheet.js'
@@ -11,6 +10,7 @@ import { LegacySessionView } from './LegacySessionView.js'
 import { logger } from '../logger.js'
 import { VoiceRecognition } from '../voice/recognition.js'
 import { settingsSheet, GEAR_SVG } from './SettingsSheet.js'
+import { autoGrowHeight, captureMaxHeight, shouldPinToBottom, isScrolledAwayFromBottom } from './captureLayout.js'
 
 const ACTIVE = 'ACTIVE'
 const DRAFT_KEY = 'footnote_draft'
@@ -18,12 +18,12 @@ const DRAFT_KEY = 'footnote_draft'
 const HEADLINES = [
   'What are you thinking?',
   'Where did that thought go?',
-  'Capture it before it disappears.',
-  "What's on your mind?",
+  'Catch it before it slips away.',
+  'What’s on your mind?',
   'Keep walking. Keep thinking.',
-  'Your next idea is out there.',
-  'Think out loud.',
   'What keeps coming back to you?',
+  'Think out loud.',
+  'Type it or say it.',
   'Start typing. The walk does the rest.',
   'Ready when you are.',
 ]
@@ -45,10 +45,11 @@ function getVoiceLabel() {
 
 /** Show a brief status toast in the empty-prompt area. */
 function showToast(emptyState, emptyPrompt, message, duration = 3000) {
+  const resting = emptyPrompt.dataset.headline || 'What are you thinking?'
   emptyPrompt.textContent = message
   emptyState.hidden = false
   setTimeout(() => {
-    emptyPrompt.textContent = 'What are you thinking?'
+    emptyPrompt.textContent = resting
   }, duration)
 }
 
@@ -64,7 +65,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     <div class="canvas-body" aria-live="polite" aria-label="Walk notes">
       <div class="journal-history"></div>
       <div class="canvas-empty">
-        <p class="canvas-empty-prompt">${headline}</p>
+        <p class="canvas-empty-prompt" data-headline="${headline}">${headline}</p>
         <div class="canvas-empty-steps"></div>
         <a class="canvas-about-link link-philosophy" href="/about.html">About Footnote</a>
       </div>
@@ -96,9 +97,19 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
       <div class="para-info-sheet-coords"></div>
       <div class="para-info-sheet-accuracy"></div>
       <div class="para-info-sheet-preview"></div>
-      <button class="para-info-sheet-close">close</button>
+      <button class="para-info-sheet-close">Close</button>
     </div>
   `
+
+  // First-run orientation (pre-walk empty state only; a started walk overwrites it).
+  const stepsEl = container.querySelector('.canvas-empty-steps')
+  if (stepsEl && !stepsEl.innerHTML.trim()) {
+    stepsEl.innerHTML = `
+      <p class="canvas-step">Start walking. Tap below when a thought lands.</p>
+      <p class="canvas-step">Type it or say it. Footnote catches it and keeps moving with you.</p>
+      <p class="canvas-step">When you stop, you get a quiet look at what you caught. Keep what you want, let the rest go.</p>
+    `
+  }
 
   const canvasBody  = container.querySelector('.canvas-body')
   const emptyState  = container.querySelector('.canvas-empty')
@@ -117,6 +128,34 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
   let _gpsInterval = null
   let _opening     = false
   let _currentSession = null  // full session record
+  let _userScrolledUp = false  // user is reading back; pause auto-pin
+  let _composing      = false  // inside an IME / autocorrect composition
+
+  // Bounded auto-grow: reset to 'auto' so scrollHeight is the true content
+  // height (never accumulates), then clamp to a viewport-relative cap so a
+  // period / iOS double-space-to-period / rapid input can't balloon the
+  // flex layout. Past the cap the textarea scrolls its own content.
+  function resizeInput() {
+    if (_composing) return  // let composition settle; the final input/end event resizes
+    const vh = (globalThis.visualViewport && globalThis.visualViewport.height) || globalThis.innerHeight || 0
+    textarea.style.height = 'auto'
+    const { height, overflow } = autoGrowHeight(textarea.scrollHeight, captureMaxHeight(vh))
+    textarea.style.height = height + 'px'
+    textarea.style.overflowY = overflow
+  }
+
+  // Keep the newest line + cursor visible during a walk. Pins both the
+  // textarea and the scroll container unless the user scrolled up to read.
+  function pinCapture() {
+    const active = canvasBody.classList.contains('walk-active')
+    const pin = shouldPinToBottom(
+      { scrollTop: textarea.scrollTop, clientHeight: textarea.clientHeight, scrollHeight: textarea.scrollHeight },
+      { activeWalk: active, userScrolledUp: _userScrolledUp },
+    )
+    if (!pin) return
+    textarea.scrollTop = textarea.scrollHeight
+    canvasBody.scrollTop = canvasBody.scrollHeight
+  }
 
   // ── GPS footer ────────────────────────────────────────────────────────── //
 
@@ -189,8 +228,9 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     if (!backBtn) {
       backBtn = document.createElement('button')
       backBtn.className = 'walk-back-btn'
-      backBtn.setAttribute('aria-label', 'Back to session list')
-      backBtn.textContent = '←'
+      backBtn.setAttribute('aria-label', 'Finish walk and review')
+      backBtn.title = 'Finish walk'
+      backBtn.innerHTML = '<span class="walk-back-arrow" aria-hidden="true">←</span><span class="walk-back-label">Done</span>'
       header.prepend(backBtn)
     }
 
@@ -218,12 +258,8 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
         _voice = new VoiceRecognition()
 
         _voice.onTranscript = (text) => {
-          // Append voice text after a space, then trigger debounced save.
-          // Auto-scroll only if the user is already near the bottom — don't
-          // interrupt them if they're reading earlier text.
-          const nearBottom =
-            textarea.scrollTop + textarea.clientHeight >= textarea.scrollHeight - 40
-
+          // First word landed — confirm transcription is actually flowing.
+          voiceIndicator.querySelector('.voice-label').textContent = 'Dictating…'
           textarea.value += (textarea.value ? ' ' : '') + text
           setChunkTimer(setTimeout(() => {
             const { location, locationStatus } = getLineLocation()
@@ -232,10 +268,9 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
               location: locationStatus === 'live' ? location : null,
             })
           }, 100))
-
-          if (nearBottom) {
-            textarea.scrollTop = textarea.scrollHeight
-          }
+          // New dictated content arriving: keep the latest line in view.
+          resizeInput()
+          pinCapture()
         }
 
         _voice.onMaxFailures = () => {
@@ -248,7 +283,8 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
         _voice.start()
         voiceIndicator.hidden = false
         voiceIndicator.classList.add('voice-indicator--active')
-        voiceIndicator.querySelector('.voice-label').textContent = 'Dictating…'
+        // Honest status: mic is warming up until the first word lands.
+        voiceIndicator.querySelector('.voice-label').textContent = 'Listening…'
         textarea.blur()
         voiceIndicator.addEventListener('click', () => {
           if (_voice) {
@@ -278,7 +314,7 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     // on visibilitychange hidden. The filename is stable so writes are idempotent.
     startLiveSync(readSession, 10_000)
 
-    // Back arrow = "I'm done here" — saves, exports, exits silently.
+    // Back arrow = "I'm done here". Saves silently, returns to the flat journal.
     async function exitWalk() {
       stopLiveSync()
       if (_voice) {
@@ -298,8 +334,8 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
       const stored = (await getAllSessions()).find(s => s.id === sessionId)
       const sessionForExport = { ...session, body: stored?.body ?? [], endedAt: stored?.endedAt ?? Date.now() }
 
-      const exportResult = await autoExport(sessionForExport)
-      if (!exportResult.saved) downloadWalkFile(sessionForExport)
+      // Silent iCloud autosave only. No fallback download (it throws iOS users into a file-viewer takeover); the walk is safe in IndexedDB. Manual .md export lives in Settings.
+      await autoExport(sessionForExport)
 
       if (_wakeLock) { _wakeLock.release(); _wakeLock = null }
       textarea.removeEventListener('compositionend', saveNow)
@@ -312,9 +348,8 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
 
       textarea.value = ''
       setActive(false)
-      showToast(emptyState, emptyPrompt, exportResult.saved ? 'Walk saved to iCloud.' : 'Walk downloaded — find it in Files.')
-      onSessionEnd?.()
-      flatCodaSheet(sessionForExport)
+      // Back in the flat journal, landed on the just-finished walk with its quiet inline Keep / Let it go affordance. No download, no review screen.
+      onSessionEnd?.(sessionId)
     }
 
     // First-tap folder prompt — textarea focus is a user gesture, so
@@ -402,8 +437,8 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
 
   async function handleLegacyEnd() {
     const ok = await confirmSheet('End this walk?', {
-      okLabel: 'end walk',
-      cancelLabel: 'keep going',
+      okLabel: 'End walk',
+      cancelLabel: 'Keep going',
     })
     if (!ok) return
     const noteCount = _legacyView.getNoteCount()
@@ -434,20 +469,35 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
     } else {
       stopGpsRefresh()
       textarea.style.height = 'auto'
+      textarea.style.overflowY = 'hidden'
+      _userScrolledUp = false
     }
   }
 
   // ── Shared event setup ────────────────────────────────────────────────── //
 
+  // iOS double-space-to-period and autocorrect fire as IME compositions.
+  // Skip resize work mid-composition; resize once on input/compositionend.
+  textarea.addEventListener('compositionstart', () => { _composing = true })
+  textarea.addEventListener('compositionend', () => { _composing = false; resizeInput(); pinCapture() })
+
   textarea.addEventListener('input', () => {
-    textarea.style.height = 'auto'
-    textarea.style.height = textarea.scrollHeight + 'px'
+    resizeInput()
+    pinCapture()
     // Legacy draft persistence (flat-doc skips this via its own handler)
     if (_currentSession && _currentSession.body === null) {
       clearTimeout(_draftTimer)
       _draftTimer = setTimeout(() => localStorage.setItem(DRAFT_KEY, textarea.value), 500)
     }
   })
+
+  // Track deliberate read-back so auto-pin backs off; resumes on focus / new content.
+  canvasBody.addEventListener('scroll', () => {
+    if (!canvasBody.classList.contains('walk-active')) return
+    _userScrolledUp = isScrolledAwayFromBottom({
+      scrollTop: canvasBody.scrollTop, clientHeight: canvasBody.clientHeight, scrollHeight: canvasBody.scrollHeight,
+    })
+  }, { passive: true })
 
   canvasBody.addEventListener('click', e => {
     if (!e.target.closest('.para-wrap') && !e.target.closest('.para-info-btn')) {
@@ -462,6 +512,8 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
       _startingWalk = true
       try { await handleStart() } finally { _startingWalk = false }
     }
+    _userScrolledUp = false  // back at the live edge; resume auto-pin
+    pinCapture()
   })
 
   textarea.addEventListener('blur', () => {
@@ -474,8 +526,8 @@ export function Editor(container, { onLineAdded, onSessionEnd } = {}) {
   document.addEventListener('footnote:inactivity-prompt', async () => {
     if (_currentSession && _currentSession.body !== null) return  // flat-doc handles its own
     const ok = await confirmSheet('Still out there? Tap to keep going.', {
-      okLabel: 'keep going',
-      cancelLabel: 'end walk',
+      okLabel: 'Keep going',
+      cancelLabel: 'End walk',
     })
     if (!ok) handleLegacyEnd()
   })

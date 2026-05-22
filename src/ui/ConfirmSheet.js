@@ -43,7 +43,7 @@ function ensureEl() {
   return _el
 }
 
-export function confirmSheet(message, { okLabel = 'confirm', cancelLabel = 'cancel', danger = false } = {}) {
+export function confirmSheet(message, { okLabel = 'Confirm', cancelLabel = 'Cancel', danger = false } = {}) {
   const el = ensureEl()
   el.msg.textContent = message
   el.ok.textContent = okLabel
@@ -57,5 +57,5 @@ export function confirmSheet(message, { okLabel = 'confirm', cancelLabel = 'canc
 }
 
 export function alertSheet(message) {
-  return confirmSheet(message, { okLabel: 'ok', cancelLabel: null })
+  return confirmSheet(message, { okLabel: 'Got it', cancelLabel: null })
 }

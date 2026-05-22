@@ -16,7 +16,7 @@ function FlatCodaSheetEl() {
     </div>
     <div class="flat-coda-body"></div>
     <div class="flat-coda-actions">
-      <button class="flat-coda-btn-done">Done</button>
+      <button class="flat-coda-btn-done">Let it go</button>
       <button class="flat-coda-btn-star">&#9733; Keep</button>
     </div>
   `

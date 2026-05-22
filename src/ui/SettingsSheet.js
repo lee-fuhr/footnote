@@ -50,7 +50,7 @@ function _ensureEl() {
       <div class="settings-row">
         <div class="settings-row-info">
           <div class="settings-row-name">AI analysis</div>
-          <div class="settings-row-desc">Find patterns across your walks</div>
+          <div class="settings-row-desc">Your walk text is sent to Claude to find patterns, then discarded. Off by default.</div>
         </div>
         <label class="settings-toggle" aria-label="Enable AI analysis">
           <input type="checkbox" class="settings-ai-toggle" />
@@ -89,7 +89,7 @@ function _ensureEl() {
       </div>
     </div>
 
-    <button class="settings-done-btn">done</button>
+    <button class="settings-done-btn">Done</button>
   `
 
   document.body.appendChild(scrim)
@@ -158,7 +158,7 @@ export async function settingsSheet() {
       el.folderBtn.textContent = 'Choose folder'
     }
   } else {
-    el.folderName.textContent = 'Auto-downloads as .md — set Safari → Downloads → iCloud Drive'
+    el.folderName.textContent = 'Auto-downloads as .md. Set Safari → Downloads → iCloud Drive.'
   }
 
   el.aiToggle.checked = (await getMeta('insightsConsentGiven')) === true

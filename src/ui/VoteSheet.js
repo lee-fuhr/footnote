@@ -1,6 +1,5 @@
 import { getIdentity } from '../identity.js'
 import { FEATURES } from '../features.js'
-import { authSheet } from './AuthSheet.js'
 
 const QUEUE_KEY = 'footnote_vote_queue'
 
@@ -18,6 +17,7 @@ function VoteSheetEl() {
     </div>
     <div class="vote-sheet-progress" aria-live="polite"></div>
     <div class="vote-sheet-cards"></div>
+    <p class="vote-sheet-note">Your vote is the one thing in Footnote that leaves your device. No account, no sign-in. Just one vote per device, so I can see what to build next. Your walks stay put.</p>
     <div class="vote-sheet-footer">
       <div class="vote-sheet-nav">
         <button class="vote-sheet-prev" aria-label="Previous feature">&#8592;</button>
@@ -25,7 +25,6 @@ function VoteSheetEl() {
       </div>
       <div class="vote-sheet-footer-right">
         <a class="vote-sheet-roadmap-link" href="/roadmap" target="_blank" rel="noopener">Full roadmap &#8594;</a>
-        <button class="vote-sheet-auth-btn" aria-label="Verify your phone">Verify phone</button>
       </div>
     </div>
   `
@@ -87,12 +86,10 @@ function VoteSheetEl() {
     _animateTap()
     _render()
 
-    const { userId, type } = getIdentity()
-    const token = type === 'user'
-      ? JSON.parse(localStorage.getItem('footnote_auth') || 'null')?.token
-      : undefined
-
-    const payload = { featureId, userId, ...(token && { token }) }
+    // Device-bound: the stable local device id is the only identity. No account,
+    // no token. One vote per device, deduped server-side by this id.
+    const { userId } = getIdentity()
+    const payload = { featureId, userId }
 
     try {
       const r = await fetch('/api/vote/cast', {
@@ -103,7 +100,7 @@ function VoteSheetEl() {
       if (!r.ok) throw new Error('cast failed')
     } catch {
       const queue = JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]')
-      queue.push({ featureId, userId, token, ts: Date.now() })
+      queue.push({ featureId, userId, ts: Date.now() })
       localStorage.setItem(QUEUE_KEY, JSON.stringify(queue))
     }
   }
@@ -156,9 +153,6 @@ function VoteSheetEl() {
   nextBtn.addEventListener('click', () => {
     if (_index < _results.length - 1) { _index++; _render() }
   })
-
-  const authBtn = el.querySelector('.vote-sheet-auth-btn')
-  authBtn.addEventListener('click', () => authSheet())
 
   closeBtn.addEventListener('click', close)
 

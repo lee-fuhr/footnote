@@ -4,16 +4,16 @@ import { alertSheet } from './ConfirmSheet.js'
 const STATUS_TEXT = {
   'gps-acquiring':  'searching',
   'gps-live':       'live',
-  'gps-live-low':   'weak',
-  'gps-stale':      '',
-  'gps-unavailable': '',
+  'gps-live-low':   'weak signal',
+  'gps-stale':      'no signal',
+  'gps-unavailable': 'off',
 }
 
 const STATUS_ARIA = {
   'gps-acquiring':  'GPS acquiring position',
   'gps-live':       'GPS active',
   'gps-live-low':   'GPS active, weak signal',
-  'gps-stale':      'GPS signal lost. Using last known position.',
+  'gps-stale':      'GPS has no signal. Using last known position.',
   'gps-unavailable': 'GPS unavailable',
 }
 

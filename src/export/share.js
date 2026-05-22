@@ -16,7 +16,7 @@ export async function shareSessionAsMarkdown(session, lines) {
     const file = new File([content], filename, { type: 'text/markdown' })
     if (navigator.canShare({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], title: 'Foot.Note Export' })
+        await navigator.share({ files: [file], title: 'Footnote Export' })
         logger.info('export', 'shared_markdown', { filename })
         return
       } catch (err) {

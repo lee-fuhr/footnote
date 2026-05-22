@@ -2,6 +2,7 @@ import { getAllSessions, getSessionLines, deleteSession, chunkBodyText, interpol
 import { shareSessionAsMarkdown, shareSessionAsText } from '../export/share.js'
 import { confirmSheet } from './ConfirmSheet.js'
 import { flatCodaSheet } from './FlatCodaSheet.js'
+import { isSessionStarred, markSessionStarred } from '../session/starred.js'
 
 const RECENT_MS = 30 * 24 * 60 * 60 * 1000
 const MAX_RECENT = 20
@@ -54,21 +55,41 @@ async function sessionText(session) {
   return ''
 }
 
-function buildWalkEl(session, text) {
+function buildWalkEl(session, text, { justEnded = false } = {}) {
   const date = formatDate(session.startedAt)
   const time = formatTime(session.startedAt)
   const dur  = formatDuration(session.startedAt, session.endedAt)
   const loc  = locStr(session)
+  const kept = isSessionStarred(session.id)
 
   const el = document.createElement('div')
-  el.className = 'walk-block'
+  el.className = 'walk-block' + (kept ? ' walk-kept' : '')
   el.dataset.id = session.id
+
+  // Kept walks carry a quiet inline star on the rule. No counts, no badge,
+  // just a single calm mark in the brown/tan palette, consistent with the doc.
+  const keptMark = kept
+    ? '<span class="walk-kept-mark" aria-label="Kept" title="Kept">&#9733;</span>'
+    : ''
+
+  // The just-finished walk gets an inline Keep / Let it go row attached to its
+  // own section, not a separate screen. Doing nothing keeps the walk; pruning
+  // is optional. Keep stars the section in place; Let it go removes it.
+  const coda = justEnded
+    ? `
+    <div class="walk-coda" role="group" aria-label="What to do with this walk">
+      <span class="walk-coda-prompt">Kept. Let it go?</span>
+      <button class="btn-walk-letgo" data-id="${session.id}">Let it go</button>
+      <button class="btn-walk-keep"  data-id="${session.id}">&#9733; Keep</button>
+    </div>`
+    : ''
+
   el.innerHTML = `
     <div class="walk-rule">
-      <span class="walk-rule-date">${date}</span>
+      <span class="walk-rule-date">${keptMark}${date}</span>
       <span class="walk-rule-meta">${time} · ${dur}${loc}</span>
     </div>
-    <div class="walk-body">${escHtml(text)}</div>
+    <div class="walk-body">${escHtml(text)}</div>${coda}
     <div class="walk-toolbar">
       <button class="btn-walk-review"  data-id="${session.id}">review ↗</button>
       <button class="btn-walk-md"      data-id="${session.id}">.md</button>
@@ -151,9 +172,44 @@ export function JournalScroll(historyEl, { canvasBody, onDelete } = {}) {
         if (s) flatCodaSheet(s)
       })
     })
+
+    // Inline Keep stars this walk's section in place and retires the coda row.
+    // No screen, no navigation. Default (no tap) already keeps the walk, so this
+    // just marks it and dismisses the prompt.
+    historyEl.querySelectorAll('.btn-walk-keep').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation()
+        const id = btn.dataset.id
+        markSessionStarred(id)
+        const block = historyEl.querySelector(`.walk-block[data-id="${id}"]`)
+        if (block) {
+          block.classList.add('walk-kept')
+          const ruleDate = block.querySelector('.walk-rule-date')
+          if (ruleDate && !block.querySelector('.walk-kept-mark')) {
+            const mark = document.createElement('span')
+            mark.className = 'walk-kept-mark'
+            mark.setAttribute('aria-label', 'Kept')
+            mark.setAttribute('title', 'Kept')
+            mark.innerHTML = '&#9733;'
+            ruleDate.prepend(mark)
+          }
+          block.querySelector('.walk-coda')?.remove()
+        }
+      })
+    })
+
+    // Inline Let it go removes this walk's section from the document.
+    historyEl.querySelectorAll('.btn-walk-letgo').forEach(btn => {
+      btn.addEventListener('click', async e => {
+        e.stopPropagation()
+        await deleteSession(btn.dataset.id)
+        onDelete?.()
+        await render()
+      })
+    })
   }
 
-  async function render() {
+  async function render({ justEndedId = null } = {}) {
     const all = await getAllSessions()
     const ended = all.filter(s => s.endedAt !== null).sort((a, b) => a.startedAt - b.startedAt)
     _sessions = ended
@@ -169,15 +225,25 @@ export function JournalScroll(historyEl, { canvasBody, onDelete } = {}) {
       historyEl.appendChild(buildArchiveEl(archived, texts))
     }
 
+    let justEndedEl = null
     for (const s of recent) {
       const text = await sessionText(s)
-      historyEl.appendChild(buildWalkEl(s, text))
+      const justEnded = s.id === justEndedId
+      const walkEl = buildWalkEl(s, text, { justEnded })
+      historyEl.appendChild(walkEl)
+      if (justEnded) justEndedEl = walkEl
     }
 
     wireButtons()
 
+    // Land on the walk just finished if there is one; otherwise rest at the
+    // bottom of the journal (the most recent walk).
     if (canvasBody) {
-      canvasBody.scrollTop = canvasBody.scrollHeight
+      if (justEndedEl) {
+        justEndedEl.scrollIntoView({ block: 'start' })
+      } else {
+        canvasBody.scrollTop = canvasBody.scrollHeight
+      }
     }
   }
 

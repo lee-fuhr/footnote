@@ -12,14 +12,14 @@ function WaitlistSheetEl() {
 
   sheet.innerHTML = `
     <p class="waitlist-sheet-title">AI pack waitlist</p>
-    <p class="waitlist-sheet-body">We&rsquo;ll notify you when it&rsquo;s ready. No spam. One email, ever.</p>
+    <p class="waitlist-sheet-body">I&rsquo;ll email you when it&rsquo;s ready. No spam. One email, ever.</p>
     <input class="waitlist-sheet-email" type="email" placeholder="your@email.com"
       autocomplete="email" autocapitalize="off" autocorrect="off" inputmode="email"/>
     <div class="waitlist-sheet-actions">
       <button class="waitlist-sheet-submit">Join</button>
       <button class="waitlist-sheet-cancel">Cancel</button>
     </div>
-    <p class="waitlist-sheet-confirm" hidden>You're on the list. We'll be in touch.</p>
+    <p class="waitlist-sheet-confirm" hidden>You&rsquo;re on the list. I&rsquo;ll be in touch.</p>
   `
 
   document.body.appendChild(scrim)

@@ -4,11 +4,14 @@
  *   2. On session end (authoritative final copy)
  *   3. On visibilitychange → hidden (iOS background protection)
  *
- * Fire-and-forget everywhere. Sync failures are logged but never surface
- * to the user or block any UI action.
+ * Gated behind AI analysis: walk text only ever leaves the device when the user
+ * has turned on AI analysis (see aiSyncGate.js). Free/Pro stay fully local —
+ * nothing is POSTed off-device for them. Fire-and-forget everywhere. Sync
+ * failures are logged but never surface to the user or block any UI action.
  */
 import { sessionToMarkdown } from '../export/markdown.js'
 import { logger } from '../logger.js'
+import { aiAnalysisEnabled } from './aiSyncGate.js'
 
 const SYNC_URL = '/api/walks/sync'
 const INTERVAL_MS = 10_000
@@ -19,6 +22,9 @@ let _inFlight = false
 
 export async function syncWalkToServer(session) {
   if (!session?.id) return { ok: false, reason: 'no-session' }
+  // Free/Pro stay fully local. Only send walk text off-device when the user has
+  // AI analysis turned on — the same promise we make for AI insights.
+  if (!(await aiAnalysisEnabled())) return { ok: false, reason: 'ai-analysis-disabled' }
   const content = sessionToMarkdown(session, [])
   try {
     const r = await fetch(SYNC_URL, {

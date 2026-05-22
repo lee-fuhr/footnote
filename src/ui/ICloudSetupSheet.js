@@ -17,7 +17,7 @@ function _ensureEl() {
     </div>
     <div class="icloud-setup-body">
 
-      <p class="icloud-setup-intro">One change in Settings and every walk automatically backs up to iCloud Drive — and shows up in Finder on your Mac.</p>
+      <p class="icloud-setup-intro">One change in Settings, and every walk backs up to iCloud Drive on its own, and shows up in Finder on your Mac.</p>
 
       <ol class="icloud-setup-steps">
 
@@ -93,7 +93,7 @@ function _ensureEl() {
       </ol>
 
       <a href="App-prefs:root=SAFARI" class="icloud-setup-cta">Open Safari Settings</a>
-      <p class="icloud-setup-note">After this one-time change, each walk downloads automatically when you finish. It appears in Files on your phone and Finder on your Mac — in iCloud Drive → Downloads.</p>
+      <p class="icloud-setup-note">After this one-time change, each walk downloads automatically when you finish. It shows up in Files on your phone and Finder on your Mac, under iCloud Drive → Downloads.</p>
 
     </div>
   `

@@ -1,6 +1,7 @@
 import { getMeta, storeMeta, getAllSessions, chunkBodyText } from '../db/index.js'
 import { requestConsent } from './ConsentSheet.js'
-import { getTier } from '../tier.js'
+import { hasAiPackAccess } from '../tier.js'
+import { getIdentity } from '../identity.js'
 import { waitlistSheet } from './WaitlistSheet.js'
 
 let _el = null
@@ -41,7 +42,7 @@ function _ensureEl() {
     <div class="insights-body">
       <div class="insights-empty" hidden>
         <p class="insights-empty-heading">Your walking thoughts,<br>organized.</p>
-        <p class="insights-empty-sub">Keep walking — themes and patterns will appear here after a few walks.</p>
+        <p class="insights-empty-sub">Keep walking. Themes and patterns will appear here after a few walks.</p>
       </div>
       <div class="insights-loading" hidden>
         <p class="insights-loading-msg">Finding patterns…</p>
@@ -54,8 +55,8 @@ function _ensureEl() {
       <div class="insights-footer" hidden>
         <span class="insights-last-analyzed"></span>
         <p class="insights-power-note" hidden>
-          You're walking more than most — Footnote's AI is designed for up to 2 walks a day.
-          You're above that, and we're keeping pace. A dedicated plan for high-volume walkers may come later.
+          You’re walking more than most. Footnote’s AI is built for up to 2 walks a day, and you’re above that.
+          I’m keeping pace for now, and a plan for heavy walkers may come later.
         </p>
       </div>
       <div class="insights-locked" hidden>
@@ -63,17 +64,17 @@ function _ensureEl() {
           <div class="insights-cluster-card insights-cluster-card--mock">
             <div class="insights-cluster-name">Morning clarity</div>
             <div class="insights-cluster-summary">Thoughts that arrive in the first ten minutes of movement.</div>
-            <div class="insights-cluster-meta">4 walks ›</div>
+            <div class="insights-cluster-meta">A recurring theme ›</div>
           </div>
           <div class="insights-cluster-card insights-cluster-card--mock">
             <div class="insights-cluster-name">Work &amp; tension</div>
-            <div class="insights-cluster-summary">What surfaces when you're carrying something unresolved.</div>
-            <div class="insights-cluster-meta">6 walks ›</div>
+            <div class="insights-cluster-summary">What surfaces when you’re carrying something unresolved.</div>
+            <div class="insights-cluster-meta">A recurring theme ›</div>
           </div>
           <div class="insights-cluster-card insights-cluster-card--mock">
             <div class="insights-cluster-name">What matters most</div>
             <div class="insights-cluster-summary">The recurring thread underneath the day-to-day thinking.</div>
-            <div class="insights-cluster-meta">8 walks ›</div>
+            <div class="insights-cluster-meta">A recurring theme ›</div>
           </div>
         </div>
         <div class="insights-lock-overlay">
@@ -288,7 +289,7 @@ async function _loadAndShow(sheet) {
   if (completedWalks.length < 3) {
     const sub = sheet.querySelector('.insights-empty-sub')
     sub.textContent = completedWalks.length === 0
-      ? 'Walk with Footnote — themes and patterns will appear after a few walks.'
+      ? 'Walk with Footnote. Themes and patterns will appear after a few walks.'
       : `${completedWalks.length} of 3 walks needed. Keep going.`
     _setState(sheet, 'empty')
     return
@@ -363,6 +364,7 @@ async function _runAnalysis(sheet) {
       headers: {
         'content-type': 'application/json',
         'x-insights-key': insightsKey,
+        'x-device-id': getIdentity().userId,
       },
       body: JSON.stringify({
         walkIds: walks.map(w => w.id),
@@ -373,7 +375,10 @@ async function _runAnalysis(sheet) {
 
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }))
-      throw new Error(err.error ?? `HTTP ${resp.status}`)
+      const e = new Error(err.error ?? `HTTP ${resp.status}`)
+      e.status = resp.status
+      e.reason = err.reason
+      throw e
     }
 
     const data = await resp.json()
@@ -387,7 +392,7 @@ async function _runAnalysis(sheet) {
 
     if (data.clusters.length === 0) {
       const sub = sheet.querySelector('.insights-empty-sub')
-      sub.textContent = 'Not enough recurring themes yet — keep walking and writing.'
+      sub.textContent = 'Not enough recurring themes yet. Keep walking and writing.'
       _setState(sheet, 'empty')
       return
     }
@@ -398,8 +403,10 @@ async function _runAnalysis(sheet) {
 
   } catch (err) {
     console.error('[insights] analysis failed:', err.message)
-    _showError(sheet, err.message === 'daily budget exceeded'
-      ? 'Daily limit reached. Try again tomorrow.'
+    // A 429 means a spend cap was hit — the server sends a clear, human message,
+    // so surface it directly. Anything else is treated as a connection problem.
+    _showError(sheet, err.status === 429
+      ? err.message
       : 'Couldn’t connect. Check your connection and try again.')
   }
 }
@@ -444,7 +451,7 @@ async function _openSheet() {
   sheet.classList.add('open')
 
   const unlocked = (await getMeta('insightsUnlocked')) === true
-  const hasAccess = unlocked || getTier() === 'ai-pack'
+  const hasAccess = unlocked || hasAiPackAccess()
   if (!hasAccess) {
     _setState(sheet, 'locked')
     return

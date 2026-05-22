@@ -38,15 +38,15 @@ Footnote is for the thoughts in between. The ones that don't deserve a home anyw
 
 ## How it works
 
-I walk the same path you do. Built by one person for himself, then shared. Your words, your route. No algorithm touches either. If the app ever makes you stop walking to use it, I messed up. It should feel like a pocket, not a tool.
+I walk the same path you do. Built by one person for himself, then shared. Your words, your route. By default, no algorithm touches either. If you choose to unlock AI Insights, your walks are sent to Anthropic's Claude with your explicit consent, analyzed, then discarded. Not stored, not used for training, off by default. If the app ever makes you stop walking to use it, I messed up. It should feel like a pocket, not a tool.
 
-The Coda offers a quiet hand-off when a walk ends, the lines you caught, ready to review or release. No other moment interrupts. Not after the first walk. Not before bed. Not ever.
+Footnote is one flat notepad. Everything you catch lives in a single continuous document, your whole walking history in one place. Features don't open new screens or carry you somewhere; they get layered onto that document as quiet inline marks. When a walk ends, you stay right where you are, in the notepad, looking at the lines you just caught. A small inline row offers to keep that walk or let it go. Do nothing and it stays. There's no separate review screen, no file to deal with, no place you get sent. Nothing about a walk ever interrupts you. The only screens that are not the notepad are the ones you choose to step into for a moment, like insights or settings, and they hand you straight back to where you were.
 
 ## What I'll get wrong
 
 This is a first attempt. Some decisions will prove wrong. I'll change them when I learn better. The goal isn't to defend the philosophy. It's to keep the product honest.
 
-Verification is the one place I haven't solved well yet. When I ask for your phone for voting, I'll ask quietly, only when it matters. I'll find a better way over time.
+Voting used to ask for your phone number, and that always sat wrong with me. I took it out. Voting is now bound to your device, one vote per device, no account and no login. Your choice leaves; nothing else does. It is the better way I said I would find.
 
 If you walk and the app gets in your way, tell me. That's how the principles earn their keep.
 
@@ -62,4 +62,4 @@ Footnote is a place for the thoughts that only show up when your feet are moving
 - **Sidewalk thought is named in three places only.** Onboarding empty state, this philosophy doc, the public `/philosophy` page. Not in microcopy. Not in error states. Not repeated mechanically.
 - **No exclamation points. No em dashes. Curly quotes always.** This isn't optional. Run `scripts/voice-lint.sh` before merge.
 - **Every new copy surface gets a philosophy-product check.** If a claim contradicts a behavior, fix the behavior or rewrite the claim. Don't ship aspirational lying.
-- **The Coda is the one allowed interruption.** Don't extend the precedent. Don't add a "second exception" later.
+- **One flat notepad. Everything lives in one continuous document.** Features get layered onto that document as inline markup or decoration, never a separate screen the user is involuntarily brought to. A few things may live in a deliberate cul-de-sac, a momentary out-and-back the user chooses to enter (insights, settings), but those return straight to the notepad. Minimum views, minimum motion, no involuntary screens. Ending a walk is turning off editing mode on the document (capture to browse), not a destination: the user stays in the document, scrolled to what they just caught. Keep and let-go are inline affordances on that walk's section, not a takeover. This supersedes the older “Coda is the one allowed interruption” framing.

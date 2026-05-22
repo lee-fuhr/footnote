@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
+// Mock the AI-analysis gate so we control whether sync is allowed.
+vi.mock('../src/sync/aiSyncGate.js', () => ({
+  aiAnalysisEnabled: vi.fn(),
+}))
+
 import { syncWalkToServer, startServerSync, stopServerSync, _resetForTesting } from '../src/sync/server.js'
+import { aiAnalysisEnabled } from '../src/sync/aiSyncGate.js'
 
 const SAMPLE_SESSION = {
   id: 'test-session-123',
@@ -13,6 +20,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms))
 
 beforeEach(() => {
   _resetForTesting()
+  // Default for the existing suite: AI analysis is ON, so sync behaves as before.
+  aiAnalysisEnabled.mockResolvedValue(true)
   vi.stubGlobal('fetch', vi.fn())
 })
 
@@ -123,5 +132,41 @@ describe('startServerSync / stopServerSync', () => {
 
     expect(fetch).toHaveBeenCalledOnce()
     resolve({ ok: true, json: async () => ({}) })
+  })
+})
+
+describe('AI-analysis gate (Free/Pro stay fully local)', () => {
+  it('a user without AI analysis enabled triggers ZERO network POSTs', async () => {
+    aiAnalysisEnabled.mockResolvedValue(false)
+    fetch.mockResolvedValue({ ok: true, json: async () => ({ ok: true }) })
+
+    const result = await syncWalkToServer(SAMPLE_SESSION)
+
+    expect(fetch).not.toHaveBeenCalled()
+    expect(result.ok).toBe(false)
+    expect(result.reason).toBe('ai-analysis-disabled')
+  })
+
+  it('an AI-analysis-enabled user still syncs', async () => {
+    aiAnalysisEnabled.mockResolvedValue(true)
+    fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true }) })
+
+    const result = await syncWalkToServer(SAMPLE_SESSION)
+
+    expect(fetch).toHaveBeenCalledOnce()
+    expect(fetch.mock.calls[0][0]).toBe('/api/walks/sync')
+    expect(result.ok).toBe(true)
+  })
+
+  it('the 60s timer makes no POSTs when AI analysis is off', async () => {
+    aiAnalysisEnabled.mockResolvedValue(false)
+    fetch.mockResolvedValue({ ok: true, json: async () => ({ ok: true }) })
+    const getter = vi.fn().mockResolvedValue(SAMPLE_SESSION)
+
+    startServerSync(getter, 50)
+    await wait(130)
+    stopServerSync()
+
+    expect(fetch).not.toHaveBeenCalled()
   })
 })

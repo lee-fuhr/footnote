@@ -1,8 +1,12 @@
 // POST /api/process-insights
 // Client sends completed walk bodies; Haiku clusters them; results returned.
 // Auth: x-insights-key header (shared secret, FOOTNOTE_INSIGHTS_KEY env var)
-// Budget: daily spend cap via DAILY_LLM_BUDGET_CENTS (default $5/day)
+// Spend caps: per-person + global, request + spend (see api/_spend-caps.js).
+//   During the friends alpha AI Pack is free for everyone, so these server-side
+//   caps are the only protection against a runaway user or bug racking up cost.
 // Idempotency: client passes processedDate; server returns cached if already done today.
+
+import { CAPS, checkPersonCap, checkGlobalCap, deviceKey } from './_spend-caps.js'
 
 const MAX_CHARS_PER_WALK = 8000  // ~2000 tokens each
 const MIN_WALKS = 3
@@ -46,24 +50,96 @@ export default async function handler(req, res) {
     })
   }
 
-  // Budget check via Redis
+  // ── Spend caps (per-person + global, request + spend) ─────────────────── //
+  // Enforced server-side via Redis counters. This is the real cost fence during
+  // the free alpha. A blocked request returns 429 with a clear, human message and
+  // a machine-readable reason; nothing crashes and we never silently overspend.
   const today = new Date().toISOString().slice(0, 10)
+  const device = deviceKey(req.headers['x-device-id'])
   const kvBase = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL
   const kvToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN
 
-  if (kvBase && kvToken) {
-    try {
-      const spent = await kv(kvBase, kvToken, 'GET', `get/insights:budget:${today}`)
-      const budgetCents = parseInt(process.env.DAILY_LLM_BUDGET_CENTS ?? '500', 10)
-      const spentCents = parseInt(spent.result ?? '0', 10)
-      if (spentCents >= budgetCents) {
-        console.log(`[insights] daily budget exhausted: ${spentCents}/${budgetCents}¢`)
-        return res.status(429).json({ error: 'daily budget exceeded' })
-      }
-    } catch (err) {
-      console.error('[insights] budget check error:', err.message)
-    }
+  // Redis key layout (all expire after 48h):
+  const KEY_GLOBAL_SPENT = `insights:budget:${today}` // legacy key — keeps existing spend tracking
+  const KEY_GLOBAL_REQS = `insights:global:requests:${today}`
+  const KEY_PERSON_SPENT = `insights:person:spent:${today}:${device}`
+  const KEY_PERSON_REQS = `insights:person:requests:${today}:${device}`
+
+  // FAIL CLOSED: the spend meter is the only thing standing between us and a
+  // runaway bill. If it isn't configured, we cannot enforce caps — so we block
+  // rather than run uncapped. No store ⇒ no AI call.
+  if (!kvBase || !kvToken) {
+    console.error('[insights] spend meter not configured — failing closed')
+    return res.status(429).json({
+      error: 'Insights are briefly unavailable. Please try again later.',
+      reason: 'spend_meter_unavailable',
+    })
   }
+
+  // DAILY_LLM_BUDGET_CENTS still overrides the global spend ceiling when set.
+  const globalSpendCap = parseInt(process.env.DAILY_LLM_BUDGET_CENTS ?? String(CAPS.GLOBAL_MAX_CENTS_PER_DAY), 10)
+
+  let globalUsage
+  let personUsage
+  try {
+    const [gSpent, gReqs, pSpent, pReqs] = await Promise.all([
+      kv(kvBase, kvToken, 'GET', `get/${KEY_GLOBAL_SPENT}`),
+      kv(kvBase, kvToken, 'GET', `get/${KEY_GLOBAL_REQS}`),
+      kv(kvBase, kvToken, 'GET', `get/${KEY_PERSON_SPENT}`),
+      kv(kvBase, kvToken, 'GET', `get/${KEY_PERSON_REQS}`),
+    ])
+    globalUsage = {
+      spentCents: parseInt(gSpent.result ?? '0', 10),
+      requests: parseInt(gReqs.result ?? '0', 10),
+    }
+    personUsage = {
+      spentCents: parseInt(pSpent.result ?? '0', 10),
+      requests: parseInt(pReqs.result ?? '0', 10),
+    }
+  } catch (err) {
+    // FAIL CLOSED: if we can't read the meter, we can't prove we're under cap.
+    console.error('[insights] spend meter read failed — failing closed:', err.message)
+    return res.status(429).json({
+      error: 'Insights are briefly unavailable. Please try again later.',
+      reason: 'spend_meter_unavailable',
+    })
+  }
+
+  // Per-person cap first (one runaway device shouldn't be able to exhaust the
+  // global budget for everyone), then the global ceiling.
+  const personCheck = checkPersonCap(personUsage)
+  if (personCheck.capped) {
+    console.log(`[insights] per-person cap hit (${device}): ${personCheck.reason}`,
+      `reqs=${personUsage.requests} spent=${personUsage.spentCents}¢`)
+    return res.status(429).json({
+      error: 'You’ve reached today’s insights limit. Try again tomorrow.',
+      reason: personCheck.reason,
+    })
+  }
+
+  const globalCheck = checkGlobalCap({
+    ...globalUsage,
+    // honor DAILY_LLM_BUDGET_CENTS override
+    spentCents: globalUsage.spentCents,
+  })
+  if (globalCheck.capped || globalUsage.spentCents >= globalSpendCap) {
+    const reason = globalCheck.capped ? globalCheck.reason : 'global_spend_cap'
+    console.log(`[insights] global cap hit: ${reason}`,
+      `reqs=${globalUsage.requests} spent=${globalUsage.spentCents}¢/${globalSpendCap}`)
+    return res.status(429).json({
+      error: 'Insights are at capacity for today. Try again tomorrow.',
+      reason,
+    })
+  }
+
+  // Count this request up front (request volume protection — bounds a runaway
+  // loop even if the LLM call later fails). Spend is added after the calls.
+  Promise.all([
+    kv(kvBase, kvToken, 'POST', `incr/${KEY_GLOBAL_REQS}`),
+    kv(kvBase, kvToken, 'POST', `expire/${KEY_GLOBAL_REQS}/172800`),
+    kv(kvBase, kvToken, 'POST', `incr/${KEY_PERSON_REQS}`),
+    kv(kvBase, kvToken, 'POST', `expire/${KEY_PERSON_REQS}/172800`),
+  ]).catch(e => console.error('[insights] request-count update error:', e.message))
 
   // Truncate walk bodies, strip any accidental location refs
   const walks = walkIds.map((id, i) => ({
@@ -212,10 +288,13 @@ export default async function handler(req, res) {
     )
     console.log(`[insights] done — haiku ${haikusIn}in/${haikusOut}out, sonnet ${sonnetIn}in/${sonnetOut}out, ~${costCents}¢`)
     if (kvToken) {
+      // Tally spend against both the global ceiling and this device's per-person cap.
       Promise.all([
-        kv(kvBase, kvToken, 'POST', `incrby/insights:budget:${today}/${costCents}`),
-        kv(kvBase, kvToken, 'POST', `expire/insights:budget:${today}/172800`),
-      ]).catch(e => console.error('[insights] budget update error:', e.message))
+        kv(kvBase, kvToken, 'POST', `incrby/${KEY_GLOBAL_SPENT}/${costCents}`),
+        kv(kvBase, kvToken, 'POST', `expire/${KEY_GLOBAL_SPENT}/172800`),
+        kv(kvBase, kvToken, 'POST', `incrby/${KEY_PERSON_SPENT}/${costCents}`),
+        kv(kvBase, kvToken, 'POST', `expire/${KEY_PERSON_SPENT}/172800`),
+      ]).catch(e => console.error('[insights] spend update error:', e.message))
     }
   }
 

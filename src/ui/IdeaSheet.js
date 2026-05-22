@@ -11,7 +11,7 @@ function IdeaSheetEl() {
   el.innerHTML = `
     <div class="idea-sheet-inner">
       <p class="idea-sheet-heading">Got an idea?</p>
-      <p class="idea-sheet-body">Footnote is open source. Ideas go straight to GitHub — no middleman.</p>
+      <p class="idea-sheet-body">Footnote is open source. Ideas go straight to GitHub, no middleman.</p>
       <div class="idea-sheet-actions">
         <button class="idea-sheet-btn-cancel">Cancel</button>
         <button class="idea-sheet-btn-open">Open GitHub ↗</button>

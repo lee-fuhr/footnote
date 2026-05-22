@@ -14,7 +14,7 @@ Foot*note* has one job. You open it, you walk, you speak (or type). Everything g
 
 - One continuous document: everything you've ever thought on a walk, with each walk marked in context. No navigation, no folders, no organization required.
 - Auto-saves everything: every keystroke, every Siri commit, before you put the phone in your pocket.
-- Stays on your device: no account, nothing leaves your phone. Provably private.
+- Stays on your device: no account, nothing leaves your phone by default. AI Insights is opt-in and consent-gated.
 - iCloud sync: your document lives in a folder you control, updating after every walk. No export step.
 - GPS and timestamp on each walk, so the thought comes back whole.
 - Screen stays on during dictation.
@@ -27,13 +27,13 @@ Foot*note* has one job. You open it, you walk, you speak (or type). Everything g
 - Walk stats: word count, duration, distance
 - Export any walk as a standalone file
 
-## AI (coming soon, optional subscription)
+## AI Pack (optional subscription)
 
-- Transcript cleanup: fixes what dictation got wrong, on-device, private
-- Walk digest: a brief summary of each walk's key ideas
-- Pattern finder: surfaces the ideas you keep returning to
-- Seed questions: suggests a thread for the next walk based on what you've been circling
-- Cross-walk connections: links a thought today to a related one from weeks ago
+- AI Insights: reads across your walks and finds the recurring themes, named and summarized
+- Exec summaries: 2-3 sentences capturing what you've actually been working through per theme
+- Walk digest, seed questions, cross-walk connections: coming
+
+AI Insights requires explicit consent before first use. Walk text is sent to Anthropic Claude for analysis, then discarded. Not stored. Not used for training. You can turn it off in Settings at any time.
 
 ---
 

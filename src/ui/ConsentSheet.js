@@ -16,9 +16,9 @@ function _ensureEl() {
   sheet.setAttribute('aria-label', 'AI analysis consent')
   sheet.innerHTML = `
     <div class="consent-sheet-body">
-      <p class="consent-sheet-heading">Before Footnote finds patterns in your walks</p>
-      <p class="consent-sheet-text">Your entries are sent to an AI model (Anthropic Claude). They're processed to find recurring themes and immediately discarded — not stored, not used for training.</p>
-      <p class="consent-sheet-text">You can turn this off in Settings at any time.</p>
+      <p class="consent-sheet-heading">Before Footnote looks for patterns in your walks</p>
+      <p class="consent-sheet-text">Your walk text goes to Claude (Anthropic&rsquo;s AI), which reads it for recurring themes and then discards it. Nothing is stored on a server, and nothing is used to train the model.</p>
+      <p class="consent-sheet-text">You can turn this off in Settings whenever you like.</p>
     </div>
     <div class="consent-sheet-actions">
       <button class="consent-btn-no">No thanks</button>

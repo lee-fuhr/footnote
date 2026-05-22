@@ -12,6 +12,12 @@ const TIER_KEY = 'footnote_tier'
 // Alpha users retain 'pro' in their localStorage; new users get 'free'.
 export const ALPHA_DEFAULT_TIER = 'pro'
 
+// FRIENDS ALPHA: AI Pack (AI Insights) is free for everyone — no payment, no
+// waitlist gate. Server-side spend caps (api/_spend-caps.js) are the cost fence.
+// To re-gate at alpha-end: set this to false and redeploy. The waitlist/lock UI
+// and the 'ai-pack' tier path stay intact, so the gate snaps back on instantly.
+export const ALPHA_AI_PACK_FREE = true
+
 export function getTier() {
   return localStorage.getItem(TIER_KEY) || ALPHA_DEFAULT_TIER
 }
@@ -27,5 +33,13 @@ export function canUseCoda() {
 }
 
 export function canAutoCoda() {
+  return getTier() === 'ai-pack'
+}
+
+// AI Pack (AI Insights) access. During the friends alpha this is free for
+// everyone via ALPHA_AI_PACK_FREE. When that flag is off it falls back to the
+// real gate: only the 'ai-pack' tier qualifies.
+export function hasAiPackAccess() {
+  if (ALPHA_AI_PACK_FREE) return true
   return getTier() === 'ai-pack'
 }

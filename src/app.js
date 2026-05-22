@@ -8,6 +8,7 @@ import { InstallBanner } from './ui/InstallBanner.js'
 import { StorageBanner } from './ui/StorageBanner.js'
 import { logger } from './logger.js'
 import { initInsights } from './ui/InsightsSheet.js'
+import { mountDevBadge } from './devBadge.js'
 
 // Legacy event relay: old deployments fire 'footnote:stack-complete'.
 // Re-dispatch as the new event name so any long-lived tab keeps working.
@@ -46,7 +47,9 @@ async function boot() {
   // Editor + journal
   const editor = Editor(document.getElementById('editor'), {
     onLineAdded: () => {},
-    onSessionEnd: () => journal.render(),
+    // Re-render the flat journal and land on the walk just finished, attaching
+    // its quiet inline Keep / Let it go affordance to that section.
+    onSessionEnd: (justEndedId) => journal.render({ justEndedId }),
   })
 
   const journal = JournalScroll(editor.journalHistory, {
@@ -93,3 +96,7 @@ boot().catch(err => {
   logger.error('app', 'boot_failed', { error: err.message })
   document.getElementById('app').innerHTML = '<p class="error">Failed to start. Please refresh.</p>'
 })
+
+// Dev-only build badge. Gated on localStorage.fn_dev so it never ships in the
+// alpha (where it leaked a debug pill and collided with the Insights hint).
+mountDevBadge({ buildTime: __BUILD_TIME__ })

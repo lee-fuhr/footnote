@@ -98,6 +98,15 @@ html, body {
 .walk-back-btn:hover { color: var(--ink); }
 .walk-back-btn:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; border-radius: 6px; }
 
+/* Back button reads as a clear finish: arrow + quiet "Done" word */
+.walk-back-btn { gap: 5px; padding: 0 10px 0 8px; }
+.walk-back-arrow { font-size: 1.4rem; line-height: 1; }
+.walk-back-label {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .03em;
+}
+
 .settings-btn {
   background: none;
   border: none;
@@ -638,6 +647,55 @@ html, body {
 .btn-walk-delete:hover              { color: #c0503a !important; border-color: #c0503a !important; }
 .walk-toolbar button:focus-visible  { outline: 2px solid var(--tan-accent); outline-offset: 2px; }
 
+/* Kept marker: a quiet inline star on the walk rule. No counts, no badge. */
+.walk-kept-mark {
+  color: var(--tan-accent);
+  font-size: .9em;
+  margin-right: 6px;
+  line-height: 1;
+}
+
+/* Inline walk-end coda: Keep / Let it go attached to the just-finished walk
+   section, in the one flat document. No modal, no slide-in, minimum motion. */
+.walk-coda {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--rule);
+}
+
+.walk-coda-prompt {
+  font-family: var(--font-mono);
+  font-size: .74rem;
+  letter-spacing: .02em;
+  color: var(--tan-text);
+  margin-right: auto;
+}
+
+.btn-walk-keep,
+.btn-walk-letgo {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .03em;
+  background: transparent;
+  color: var(--tan-text);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0 12px;
+  min-height: 36px;
+  cursor: pointer;
+  transition: color .4s, border-color .4s;
+  white-space: nowrap;
+}
+
+.btn-walk-keep:hover  { color: var(--tan-accent); border-color: var(--tan-accent); }
+.btn-walk-letgo:hover { color: var(--ink); border-color: var(--tan-text); }
+.btn-walk-keep:focus-visible,
+.btn-walk-letgo:focus-visible { outline: 2px solid var(--tan-accent); outline-offset: 2px; }
+
 /* Archive section — older than 30 days */
 .walk-archive {
   padding-bottom: 8px;
@@ -948,119 +1006,6 @@ html, body {
 }
 .tier-vote-btn:hover { color: var(--ink); border-color: var(--ink); }
 
-/* ── Auth sheet ─────────────────────────────────────────────────────────── */
-.auth-sheet-scrim {
-  position: fixed;
-  inset: 0;
-  background: rgba(28,24,20,.25);
-  z-index: 199;
-  display: none;
-}
-.auth-sheet-scrim.open { display: block; }
-
-.auth-sheet {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  max-width: 640px;
-  margin: 0 auto;
-  background: var(--bg);
-  border-top: 1px solid var(--rule);
-  box-shadow: 0 -4px 24px rgba(28,24,20,.12);
-  padding: 28px 24px;
-  padding-bottom: max(28px, env(safe-area-inset-bottom));
-  transform: translateY(100%);
-  transition: transform .22s cubic-bezier(.4,0,.2,1);
-  z-index: 200;
-}
-.auth-sheet.open { transform: translateY(0); }
-
-.auth-sheet-title {
-  font-family: var(--font-body);
-  font-size: 1.1rem;
-  color: var(--ink);
-  margin-bottom: 8px;
-}
-
-.auth-sheet-body {
-  font-family: var(--font-body);
-  font-size: .9rem;
-  color: var(--tan-text);
-  line-height: 1.5;
-  margin-bottom: 20px;
-}
-
-.auth-sheet-input {
-  width: 100%;
-  font-family: var(--font-mono);
-  font-size: .85rem;
-  color: var(--ink);
-  background: transparent;
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  padding: 12px 14px;
-  margin-bottom: 8px;
-  outline: none;
-  -webkit-appearance: none;
-  transition: border-color .15s;
-}
-.auth-sheet-input:focus { border-color: var(--tan-accent); }
-
-.auth-sheet-error {
-  font-family: var(--font-mono);
-  font-size: .72rem;
-  color: #c0503a;
-  margin-bottom: 12px;
-  line-height: 1.4;
-}
-
-.auth-sheet-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.auth-sheet-submit,
-.auth-sheet-verify,
-.auth-sheet-cancel,
-.auth-sheet-back {
-  flex: 1;
-  font-family: var(--font-mono);
-  font-size: .78rem;
-  letter-spacing: .04em;
-  min-height: 44px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background .15s, color .15s, border-color .15s, opacity .15s;
-}
-
-.auth-sheet-submit,
-.auth-sheet-verify {
-  background: var(--tan-accent);
-  color: var(--bg);
-  border: 1px solid var(--tan-accent);
-}
-.auth-sheet-submit:hover,
-.auth-sheet-verify:hover { opacity: .85; }
-.auth-sheet-submit:disabled,
-.auth-sheet-verify:disabled { opacity: .5; cursor: not-allowed; }
-
-.auth-sheet-cancel,
-.auth-sheet-back {
-  background: transparent;
-  color: var(--tan-text);
-  border: 1px solid var(--rule);
-}
-.auth-sheet-cancel:hover,
-.auth-sheet-back:hover { border-color: var(--tan-accent); color: var(--tan-accent); }
-
-.auth-sheet-confirm {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  color: var(--tan-accent);
-  font-style: italic;
-  padding: 8px 0;
-}
-
 /* ── Vote sheet ─────────────────────────────────────────────────────────── */
 .vote-sheet {
   position: fixed;
@@ -1187,11 +1132,9 @@ html, body {
   animation: vote-tap-pulse .3s ease;
 }
 
-.vote-card-count {
-  font-family: var(--font-mono);
-  font-size: .72rem;
-  color: var(--tan-text);
-  text-align: center;
+.vote-sheet-note {
+  font-family: var(--font-body); font-size: .82rem; line-height: 1.5;
+  color: var(--tan-text); padding: 0 24px 4px; font-style: italic;
 }
 
 .vote-sheet-footer {
@@ -1965,7 +1908,9 @@ a.link-philosophy:visited {
 .insights-hint {
   position: fixed;
   right: 20px;
-  bottom: max(20px, env(safe-area-inset-bottom));
+  /* Sit clear of the GPS footer row (about 36px tall plus its bottom inset)
+     so the hint never crowds the footer rule on first load. */
+  bottom: calc(44px + max(8px, env(safe-area-inset-bottom)));
   font-family: var(--font-mono);
   font-size: .66rem;
   color: var(--tan-text);
@@ -2593,4 +2538,20 @@ body:has(.voice-indicator--active) .insights-hint { opacity: 0; pointer-events: 
 .insights-cluster-card:focus-visible {
   outline: 2px solid var(--tan-accent);
   outline-offset: 2px;
+}
+
+/* ── Dev build badge (fn_dev localStorage flag) ─────────────────────────── */
+#fn-build-badge {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-size: 11px;
+  font-family: ui-monospace, monospace;
+  padding: 2px 7px;
+  border-radius: 10px;
+  z-index: 99999;
+  pointer-events: none;
+  letter-spacing: 0.02em;
 }

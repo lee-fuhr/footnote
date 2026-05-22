@@ -11,7 +11,7 @@ export function InstallBanner(container) {
   const banner = document.createElement('div')
   banner.className = 'install-banner'
   banner.innerHTML = `
-    <span>Install Foot.Note: tap <strong>Share</strong> → <strong>Add to Home Screen</strong> for offline access. Your notes and GPS data never leave this device.</span>
+    <span>Install Footnote: tap <strong>Share</strong> → <strong>Add to Home Screen</strong> so it opens like an app and works offline. No account, no login. Your walks and their location stay on your device. The only thing that ever leaves is your walk text, sent to Claude when you turn on AI analysis, and discarded right after.</span>
     <button class="install-banner-dismiss" aria-label="Dismiss">✕</button>
   `
 
